@@ -1,0 +1,74 @@
+{
+    "status": "1",
+    "info": "OK",
+    "infocode": "10000",
+    "count": "3",
+    "geocodes": [
+        {
+            "formatted_address": "广西壮族自治区河池市宜州区长湴",
+            "country": "中国",
+            "province": "广西壮族自治区",
+            "citycode": "0778",
+            "city": "河池市",
+            "district": "宜州区",
+            "township": [],
+            "neighborhood": {
+                "name": [],
+                "type": []
+            },
+            "building": {
+                "name": [],
+                "type": []
+            },
+            "adcode": "451203",
+            "street": [],
+            "number": [],
+            "location": "108.539971,24.451164",
+            "level": "村庄"
+        },
+        {
+            "formatted_address": "广西壮族自治区玉林市容县长湴",
+            "country": "中国",
+            "province": "广西壮族自治区",
+            "citycode": "0775",
+            "city": "玉林市",
+            "district": "容县",
+            "township": [],
+            "neighborhood": {
+                "name": [],
+                "type": []
+            },
+            "building": {
+                "name": [],
+                "type": []
+            },
+            "adcode": "450921",
+            "street": [],
+            "number": [],
+            "location": "110.697840,22.502826",
+            "level": "村庄"
+        },
+        {
+            "formatted_address": "广东省广州市天河区长湴",
+            "country": "中国",
+            "province": "广东省",
+            "citycode": "020",
+            "city": "广州市",
+            "district": "天河区",
+            "township": [],
+            "neighborhood": {
+                "name": [],
+                "type": []
+            },
+            "building": {
+                "name": [],
+                "type": []
+            },
+            "adcode": "440106",
+            "street": [],
+            "number": [],
+            "location": "113.352872,23.170714",
+            "level": "兴趣点"
+        }
+    ]
+}

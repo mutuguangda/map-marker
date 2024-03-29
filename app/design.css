@@ -1,0 +1,8 @@
+body {
+  background-color: var(--background);
+}
+
+.main {
+  height: 80vh;
+  width: 80vw;
+}
