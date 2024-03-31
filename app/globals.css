@@ -75,8 +75,6 @@
   }
 }
 
-@import url(https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-webfont@1.1.0/style.css);
-
 * {
   box-sizing: border-box;
   position: relative;
@@ -85,7 +83,6 @@
 
 body {
   min-height: 100vh;
-  font-family: "Inter", "LXGW WenKai Screen", sans-serif !important;
   display: flex;
   min-height: 100vh;
   justify-content: center;
