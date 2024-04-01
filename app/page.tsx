@@ -112,7 +112,8 @@ export default function Home() {
           })}
         </div>
       </div>
-      <Map className="main" option={currentOption} />
+      {/* <Map className="main" option={currentOption} /> */}
+      <Map className="main" />
     </div>
   );
 }
