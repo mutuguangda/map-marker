@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { useCopyToClipboard } from "react-use";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { merge } from 'lodash-es'
+import { cloneDeep, merge } from 'lodash-es'
 import { atou, utoa } from "./utils";
 import { Map } from '@/components/chart/map'
 import data from './data.json'
@@ -50,7 +50,6 @@ export default function Home() {
     baseOption.current = JSON.parse(atou(hash.slice(1)))
   }
 
-  const [count, setCount] = useState(0)
   const [positions, setPositions] = useState(data.geocodes)
   const [currentOption, setCurrentOption] = useState<echarts.EChartsOption>(baseOption.current)
 
@@ -76,6 +75,7 @@ export default function Home() {
   const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
     const position = positions[(e.target as unknown as any).getAttribute('data-index')]
     const _point = { name: position['formatted_address'], coord: position.location.split(',') }
+    console.log('currentOption',currentOption)
     // @ts-ignore
     const originPoints = currentOption.series!.markPoint.data
     setOption({ series: { markPoint: { data: [...originPoints, _point] } } })
@@ -83,8 +83,8 @@ export default function Home() {
 
   const setOption = (option: echarts.EChartsOption) => {
     const currentOption = merge(baseOption.current, option)
-    console.log('currentOption', currentOption)
-    setCurrentOption(currentOption)
+    // 有没有更优雅的办法
+    setCurrentOption(() => cloneDeep(currentOption))
   }
 
   const handleExport: MouseEventHandler<HTMLButtonElement> = (e) => {
@@ -105,7 +105,6 @@ export default function Home() {
     <div className="flex">
       <div className="panel w-64">
         <Button onClick={handleExport}>导出</Button>
-        <Button onClick={() => setCount(count + 1)}>导出</Button>
         <Input onKeyDown={handleKeyDown} />
         <div className="flex flex-col gap-2" onClick={handleClick}>
           {positions.map((position, index) => {
@@ -113,7 +112,7 @@ export default function Home() {
           })}
         </div>
       </div>
-      <Map className="main" option={currentOption} count={count} />
+      <Map className="main" option={currentOption} />
     </div>
   );
 }

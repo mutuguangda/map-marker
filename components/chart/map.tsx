@@ -21,7 +21,7 @@ interface Props {
   className: string,
 }
 
-const Map = React.forwardRef<HTMLDivElement, Props>(({ className, option: baseOption = {}, count }) => {
+const Map = React.forwardRef<HTMLDivElement, Props>(({ className, option: baseOption = {} }, _ref) => {
   let chart = React.useRef<echarts.ECharts | null>(null)
   const map = React.useRef<HTMLDivElement | null>(null);
   const popupRef = React.useRef(null)
@@ -31,13 +31,22 @@ const Map = React.forwardRef<HTMLDivElement, Props>(({ className, option: baseOp
     setPopup(_popup);
   }, [setPopup]);
 
+  const setOption = React.useCallback((option: echarts.EChartsOption) => {
+    chart.current?.setOption(option)
+  }, [])
+
   // @ts-ignore
   echarts.registerMap("china", china);
 
   React.useEffect(() => {
+    if (!chart.current) return
+    setOption(baseOption)
+  }, [baseOption, setOption])
+
+  React.useEffect(() => {
     if (chart.current) return
     chart.current = echarts.init(map?.current);
-    setOption(baseOption, true);
+    setOption(baseOption);
 
     chart.current.on('click', (params) => {
       const { event, componentType, data = {} } = params
@@ -47,14 +56,6 @@ const Map = React.forwardRef<HTMLDivElement, Props>(({ className, option: baseOp
     })
   });
 
-  React.useEffect(() => {
-    console.log('baseOption',baseOption)
-  }, [baseOption])
-
-  React.useEffect(() => {
-    console.log('count',count)
-  }, [count])
-
   useClickAway(popupRef, () => {
     if (popup.style.display === 'none') {
       return
@@ -63,17 +64,8 @@ const Map = React.forwardRef<HTMLDivElement, Props>(({ className, option: baseOp
     setOption({ series: [{ roam: true }] })
   })
 
-  const setOption = (option: echarts.EChartsOption, force: boolean = false) => {
-    let currentOption = option
-    if (!force) {
-      currentOption = merge(baseOption, option)
-    }
-    chart.current?.setOption(currentOption)
-  }
-
   return (
     <div className="relative">
-      {count}
       <div className={className} ref={map}></div>
       {/* 地图标点浮窗，点击后展示 */}
       <Card ref={popupRef} className="absolute left-0 top-0" style={popup.style}>
