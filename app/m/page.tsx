@@ -10,6 +10,7 @@ export default function Ifrme({}: Props) {
   const baseOption = JSON.parse(atou(hash.slice(1)))
 
   return (
-    <Map className="w-screen h-screen" option={baseOption} />
+    // <Map className="w-screen h-screen" option={baseOption} />
+    <div>Hello World</div>
   )
 }
