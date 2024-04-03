@@ -9,6 +9,7 @@ import { cloneDeep, merge } from 'lodash-es'
 import { atou, utoa } from "./utils";
 import { Map } from '@/components/chart/map'
 import data from './data.json'
+import MapContainer from "@/components/chart/bmap";
 
 export default function Home() {
   const baseOption = useRef<echarts.EChartsOption>({
@@ -102,18 +103,17 @@ export default function Home() {
   }
 
   return (
-    <div className="flex">
-      <div className="panel w-64">
-        <Button onClick={handleExport}>导出</Button>
+    <div className="main relative">
+      <div className="bg-background w-96 p-3 absolute left-5 top-5 z-50 border rounded-md">
+        {/* <Button onClick={handleExport}>导出</Button> */}
         <Input onKeyDown={handleKeyDown} />
-        <div className="flex flex-col gap-2" onClick={handleClick}>
+        <div className="mt-2 flex flex-col gap-2" onClick={handleClick}>
           {positions.map((position, index) => {
             return <div className="p-2 border" key={position.location} data-index={index}>{position.formatted_address}</div>
           })}
         </div>
       </div>
-      {/* <Map className="main" option={currentOption} /> */}
-      {/* <Map className="main" /> */}
+      <MapContainer className="w-full h-full" />
     </div>
   );
 }
