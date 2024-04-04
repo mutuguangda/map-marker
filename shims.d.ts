@@ -1,1 +1,13 @@
-type Recordable<T = any> = Record<string, T>
+export {}
+
+declare global {
+  namespace NodeJS {
+    interface ProcessEnv {
+      BMAP_API_KEY: string
+      BMAP_SECRET_KEY: string
+      BMAP_STYLE_ID: string
+    }
+  }
+
+  type Recordable<T = any> = Record<string, T>
+}
