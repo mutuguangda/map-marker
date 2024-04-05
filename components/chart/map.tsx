@@ -65,7 +65,7 @@ const _baseOption: ECOption = {
     // 高德地图初始缩放级别
     zoom: 4,
     // 是否开启resize
-    resizeEnable: true,
+    // resizeEnable: true,
     // 自定义地图样式主题
     mapStyle: 'amap://styles/dark',
     // 移动过程中实时渲染 默认为true 如数据量较大 建议置为false
