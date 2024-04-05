@@ -1,13 +1,8 @@
 "use client";
-import { KeyboardEventHandler, MouseEventHandler, useCallback, useEffect, useRef, useState } from "react";
-// import * as echarts from "echarts";
-import { InputSearch } from "@/components/ui/input-search"
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useCopyToClipboard } from "react-use";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { cloneDeep, merge } from 'lodash-es'
 import { atou, utoa } from "./utils";
-import data from './data.json'
 import MapContainer, { BMapOptionType, PointType } from "@/components/chart/amap";
 
 export default function Home() {
@@ -15,13 +10,10 @@ export default function Home() {
     mapStyle: process.env.BMAP_STYLE_ID,
     points: {}
   });
-  const hash = location.hash
+  const hash = typeof window !== 'undefined' ? window.location.hash : ''
   if (hash) {
     baseOption.current = JSON.parse(atou(hash.slice(1)))
   }
-
-  const [positions, setPositions] = useState(data.geocodes)
-  const [currentOption, setCurrentOption] = useState(baseOption.current)
 
   // 会触发视图更新
   const [_, _copyToClipboard] = useCopyToClipboard();
@@ -34,7 +26,7 @@ export default function Home() {
     const down = (e: KeyboardEvent) => {
       if (e.key === "s" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault()
-        const hash = utoa(JSON.stringify(currentOption))
+        const hash = utoa(JSON.stringify(baseOption.current))
         const url = `${location.origin}/m/#${hash}`
         copyToClipboard(url)
         toast({
@@ -52,6 +44,6 @@ export default function Home() {
   })
 
   return (
-    <MapContainer className="main" option={currentOption} />
+    <MapContainer className="main" option={baseOption.current} />
   );
 }

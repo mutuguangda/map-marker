@@ -3,14 +3,9 @@ import { KeyboardEventHandler, MouseEventHandler, useEffect, useRef, useState } 
 import { createRoot } from 'react-dom/client';
 import AMapLoader from "@amap/amap-jsapi-loader";
 import '@amap/amap-jsapi-types';
-import { Input } from "../ui/input";
 import { InputSearch } from "../ui/input-search";
-import { Button } from "../ui/button";
 import { ScrollArea } from '../ui/scroll-area'
-import { cloneDeep } from "lodash-es";
-import { useCopyToClipboard } from "react-use";
-import { useToast } from "../ui/use-toast";
-import data from './data.json' 
+import data from './data.json'
 import { utoa } from "@/app/utils";
 import { Textarea } from "../ui/textarea";
 
@@ -33,7 +28,7 @@ export interface PointType {
 }
 
 export default function MapContainer({ className, option }: PropsType) {
-  const el = useRef<HTMLDivElement | null>(null) 
+  const el = useRef<HTMLDivElement | null>(null)
   const map = useRef<AMap.Map | null>(null);
   const infoWindow = useRef<AMap.InfoWindow | null>(null)
   const inputSearch = useRef<HTMLInputElement | null>(null)
@@ -41,52 +36,51 @@ export default function MapContainer({ className, option }: PropsType) {
 
   const mapStyle = option.mapStyle || 'amap://styles/a927524f8e540e512b9bdea1cad3d6fb'; // 使用灰色风格
 
-  const GMap = useRef<typeof AMap | null>(null) 
+  const GMap = useRef<typeof AMap | null>(null)
 
   const [positions, setPositions] = useState(data.geocodes)
-  // const [_, copyToClipboard] = useCopyToClipboard();
-  // const { toast } = useToast()
 
   useEffect(() => {
-    if (typeof window !== undefined) {
-      // @ts-ignore
-      window._AMapSecurityConfig = { serviceHost: `${location.origin}/_AMapService` }
-    }
-    AMapLoader.load({
-      key: "dafe1244843ac4a6721a014970c63558",
-      version: "2.0",
-      plugins: ["AMap.AutoComplete"], //需要使用的的插件列表
-    })
-      .then((_AMap: typeof AMap) => { 
-        GMap.current = _AMap
-
-        map.current = new _AMap.Map(el.current!, {
-          viewMode: "2D",
-          zoom: 4,
-          mapStyle
-        });
-
-        infoWindow.current = new _AMap.InfoWindow({ offset: new _AMap.Pixel(0, -30) });  
-
-        const points = option.points
-        Object.keys(points).forEach((key) => {
-          setPoint(points[key], true)
-        })
-
-        // @ts-ignore
-        const autoComplete = new _AMap.AutoComplete({
-          input: inputSearch.current,
-          output: scrollContainer.current
-        })
-        autoComplete.on('select', (e: any) => {
-          const { name, location } = e.poi
-          setPoint({ title: name, position: location, description: '' })
-        })
-        map.current.addControl(autoComplete)
+    if (typeof window === 'undefined') return
+    // @ts-ignore
+    window._AMapSecurityConfig = { serviceHost: `${location.origin}/_AMapService` }
+    import('@amap/amap-jsapi-loader').then(AMapLoader => {
+      AMapLoader.load({
+        key: "dafe1244843ac4a6721a014970c63558",
+        version: "2.0",
+        plugins: ["AMap.AutoComplete"], //需要使用的的插件列表
       })
-      .catch((e) => {
-        console.log(e);
-      });
+        .then((_AMap: typeof AMap) => {
+          GMap.current = _AMap
+
+          map.current = new _AMap.Map(el.current!, {
+            viewMode: "2D",
+            zoom: 4,
+            mapStyle
+          });
+
+          infoWindow.current = new _AMap.InfoWindow({ offset: new _AMap.Pixel(0, -30) });
+
+          const points = option.points
+          Object.keys(points).forEach((key) => {
+            setPoint(points[key], true)
+          })
+
+          // @ts-ignore
+          const autoComplete = new _AMap.AutoComplete({
+            input: inputSearch.current,
+            output: scrollContainer.current
+          })
+          autoComplete.on('select', (e: any) => {
+            const { name, location } = e.poi
+            setPoint({ title: name, position: location, description: '' })
+          })
+          map.current.addControl(autoComplete)
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    })
 
     return () => {
       map.current?.destroy();
@@ -116,7 +110,7 @@ export default function MapContainer({ className, option }: PropsType) {
     }
 
     const marker = new GMap.current!.Marker({
-      position: point.position,    
+      position: point.position,
       map: map.current!
     })
     const element = document.createElement('div')
@@ -144,7 +138,7 @@ export default function MapContainer({ className, option }: PropsType) {
       }, 50)
     })
     marker.emit('click', { target: marker })
-    
+
     replaceUrl()
   }
 
@@ -164,10 +158,10 @@ export default function MapContainer({ className, option }: PropsType) {
 
   const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
     const position = positions[(e.target as unknown as any).getAttribute('data-index')]
-    const point: PointType = { 
+    const point: PointType = {
       title: position['formatted_address'],
       position: position.location.split(',').map(parseFloat) as any,
-      description: '' 
+      description: ''
     }
     setPoint(point)
   }
@@ -187,7 +181,7 @@ export default function MapContainer({ className, option }: PropsType) {
             {positions.map((position, index) => {
               return <div className="text-xs p-2 border" key={position.location} data-index={index}>{position.formatted_address}</div>
             })}
-          </div>          
+          </div>
           <div ref={scrollContainer}></div>
         </ScrollArea>
       </div>

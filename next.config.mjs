@@ -14,10 +14,6 @@ const nextConfig = {
         source: '/_AMapService/:path*',
         destination: `https://restapi.amap.com/:path*?jscode=${process.env.BMAP_SECRET_KEY}`
       },
-      {
-        source: '/api/:path*',
-        destination: `https://baidu.com/:path*?jscode=${process.env.BMAP_SECRET_KEY}`,
-      }
     ] 
   },
 };

@@ -2,6 +2,7 @@
 import * as React from 'react'
 import { atou } from '../utils'
 import MapContainer from '@/components/chart/amap'
+import { useRouter } from 'next/router'
 
 type Props = {}
 
