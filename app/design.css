@@ -8,12 +8,12 @@ body {
   width: 100vw;
 }
 
-#my-output .auto-item {
+.auto-item {
   border: 1px solid #eee;   
   padding: 0.5rem;
   margin-bottom: 0.5rem;
 }
 
-#my-output .auto-item:last-child {
+.auto-item:last-child {
   margin-bottom: 0;
 }

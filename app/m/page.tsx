@@ -2,11 +2,8 @@
 import * as React from 'react'
 import { atou } from '../utils'
 import MapContainer from '@/components/chart/amap'
-import { useRouter } from 'next/router'
 
-type Props = {}
-
-export default function Page({}: Props) {
+export default function Page() {
   const hash = typeof window !== 'undefined' ? window.location.hash: ''
 
   let baseOption
@@ -17,6 +14,6 @@ export default function Page({}: Props) {
   }
 
   return (
-    <MapContainer className="w-screen h-screen" option={baseOption} />
+    <MapContainer className="w-screen h-screen" option={baseOption} preview={true} />
   )
 }

@@ -1,17 +1,16 @@
 "use client"
 import { KeyboardEventHandler, MouseEventHandler, useEffect, useRef, useState } from "react";
 import { createRoot } from 'react-dom/client';
-import AMapLoader from "@amap/amap-jsapi-loader";
 import '@amap/amap-jsapi-types';
 import { InputSearch } from "../ui/input-search";
 import { ScrollArea } from '../ui/scroll-area'
-import data from './data.json'
 import { utoa } from "@/app/utils";
 import { Textarea } from "../ui/textarea";
 
 interface PropsType {
   className?: string
   option: BMapOptionType
+  preview?: boolean
 }
 
 export interface BMapOptionType {
@@ -27,7 +26,7 @@ export interface PointType {
   position: [number, number]
 }
 
-export default function MapContainer({ className, option }: PropsType) {
+export default function MapContainer({ className, option, preview = false }: PropsType) {
   const el = useRef<HTMLDivElement | null>(null)
   const map = useRef<AMap.Map | null>(null);
   const infoWindow = useRef<AMap.InfoWindow | null>(null)
@@ -38,7 +37,7 @@ export default function MapContainer({ className, option }: PropsType) {
 
   const GMap = useRef<typeof AMap | null>(null)
 
-  const [positions, setPositions] = useState(data.geocodes)
+  const [positions, setPositions] = useState([])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -48,7 +47,7 @@ export default function MapContainer({ className, option }: PropsType) {
       AMapLoader.load({
         key: "dafe1244843ac4a6721a014970c63558",
         version: "2.0",
-        plugins: ["AMap.AutoComplete"], //需要使用的的插件列表
+        plugins: ["AMap.AutoComplete"],
       })
         .then((_AMap: typeof AMap) => {
           GMap.current = _AMap
@@ -88,6 +87,7 @@ export default function MapContainer({ className, option }: PropsType) {
   });
 
   useEffect(() => {
+    if (preview) return
     const down = (e: KeyboardEvent) => {
       if (e.key === "q" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault()
@@ -119,13 +119,19 @@ export default function MapContainer({ className, option }: PropsType) {
     const elementChildren = (
       <div className="flex flex-col gap-2">
         <h6 className="text-xs">{point.title}</h6>
-        <Textarea
-          defaultValue={point.description}
-          onChange={(e) => {
-            point.description = e.target.value
-            replaceUrl()
-          }}
-        />
+        {
+          !preview 
+            ? 
+              <Textarea
+                defaultValue={point.description}
+                onChange={(e) => {
+                  point.description = e.target.value
+                  replaceUrl()
+                }}
+              />
+            :
+              <div className="text-xs">{point.description}</div>
+        }
       </div>
     )
     const root = createRoot(element)
@@ -171,20 +177,26 @@ export default function MapContainer({ className, option }: PropsType) {
     window.history.replaceState({}, '', `${location.origin}#${hash}`);
   }
 
-  return (
-    <div className="w-full h-full relative">
+  const Control = () => {
+    if (preview) return
+    return (
       <div className="bg-background w-96 p-3 absolute left-5 top-5 z-50 border rounded-md">
-        {/* <Button onClick={handleExport}>导出</Button> */}
         <InputSearch ref={inputSearch} onKeyUp={handleKeyUp} />
         <ScrollArea className="mt-2">
           <div className="mt-2 flex flex-col gap-2" onClick={handleClick}>
             {positions.map((position, index) => {
-              return <div className="text-xs p-2 border" key={position.location} data-index={index}>{position.formatted_address}</div>
+              return <div className="p-2 border" key={position.location} data-index={index}>{position.formatted_address}</div>
             })}
           </div>
           <div ref={scrollContainer}></div>
         </ScrollArea>
       </div>
+    )
+  }
+
+  return (
+    <div className="w-full h-full relative">
+      <Control />
       <div
         ref={el}
         className={className}

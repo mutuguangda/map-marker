@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useCopyToClipboard } from "react-use";
 import { useToast } from "@/components/ui/use-toast";
 import { atou, utoa } from "./utils";
-import MapContainer, { BMapOptionType, PointType } from "@/components/chart/amap";
+import MapContainer, { BMapOptionType } from "@/components/chart/amap";
 
 export default function Home() {
   const baseOption = useRef<BMapOptionType>({
