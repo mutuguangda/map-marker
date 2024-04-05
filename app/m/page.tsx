@@ -16,7 +16,6 @@ export default function Page({}: Props) {
   }
 
   return (
-    // <MapContainer className="w-screen h-screen" option={baseOption} />
-    <div>m</div>
+    <MapContainer className="w-screen h-screen" option={baseOption} />
   )
 }
