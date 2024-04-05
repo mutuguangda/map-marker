@@ -7,7 +7,7 @@ import { useRouter } from 'next/router'
 type Props = {}
 
 export default function Page({}: Props) {
-  const hash = typeof window !== undefined ? window.location.hash: ''
+  const hash = typeof window !== 'undefined' ? window.location.hash: ''
 
   let baseOption
   try {
