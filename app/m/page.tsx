@@ -7,9 +7,16 @@ type Props = {}
 
 export default function Page({}: Props) {
   const hash = window.location.hash
-  const baseOption = JSON.parse(atou(hash.slice(1)))
+
+  let baseOption
+  try {
+    baseOption = JSON.parse(atou(hash.slice(1)))
+  } catch (error) {
+    baseOption = {}
+  }
 
   return (
-    <MapContainer className="w-screen h-screen" option={baseOption} />
+    // <MapContainer className="w-screen h-screen" option={baseOption} />
+    <div>m</div>
   )
 }

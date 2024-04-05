@@ -43,22 +43,22 @@ export default function MapContainer({ className, option }: PropsType) {
 
   const GMap = useRef<typeof AMap | null>(null) 
 
-  const [positions, setPositions] = useState(data.geocodes)
-
-  const [_, copyToClipboard] = useCopyToClipboard();
-
-  const { toast } = useToast()
+  // const [positions, setPositions] = useState(data.geocodes)
+  // const [_, copyToClipboard] = useCopyToClipboard();
+  // const { toast } = useToast()
 
   useEffect(() => {
     // @ts-ignore
-    window._AMapSecurityConfig = { securityJsCode: '4ebbc57caa8127e6c4fc6288a5782a4c' };
+    // window._AMapSecurityConfig = process.env.NODE_ENV === 'development'
+    window._AMapSecurityConfig = process.env.NODE_ENV === 'production'
+      ? { securityJsCode: '4ebbc57caa8127e6c4fc6288a5782a4c' }
+      : { serviceHost: 'http://localhost:3000/_AMapService' };
     AMapLoader.load({
       key: "dafe1244843ac4a6721a014970c63558",
       version: "2.0",
       plugins: ["AMap.AutoComplete"], //需要使用的的插件列表
     })
-      .then((_AMap: typeof AMap) => {
-        GMap.current = _AMap
+      .then((_AMap: typeof AMap) => { 
 
         map.current = new _AMap.Map(el.current!, {
           viewMode: "2D",
