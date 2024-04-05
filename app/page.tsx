@@ -15,7 +15,7 @@ export default function Home() {
     mapStyle: process.env.BMAP_STYLE_ID,
     points: {}
   });
-  const hash = window.location.hash
+  const hash = location.hash
   if (hash) {
     baseOption.current = JSON.parse(atou(hash.slice(1)))
   }
@@ -35,7 +35,7 @@ export default function Home() {
       if (e.key === "s" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault()
         const hash = utoa(JSON.stringify(currentOption))
-        const url = `${window.location.origin}/m/#${hash}`
+        const url = `${location.origin}/m/#${hash}`
         copyToClipboard(url)
         toast({
           title: '已导出到剪贴板',

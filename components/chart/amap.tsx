@@ -48,11 +48,10 @@ export default function MapContainer({ className, option }: PropsType) {
   // const { toast } = useToast()
 
   useEffect(() => {
-    // @ts-ignore
-    // window._AMapSecurityConfig = process.env.NODE_ENV === 'development'
-    window._AMapSecurityConfig = process.env.NODE_ENV === 'production'
-      ? { securityJsCode: '4ebbc57caa8127e6c4fc6288a5782a4c' }
-      : { serviceHost: `${location.origin}/_AMapService` };
+    if (typeof window !== undefined) {
+      // @ts-ignore
+      window._AMapSecurityConfig = { serviceHost: `${location.origin}/_AMapService` }
+    }
     AMapLoader.load({
       key: "dafe1244843ac4a6721a014970c63558",
       version: "2.0",

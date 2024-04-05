@@ -6,7 +6,7 @@ import MapContainer from '@/components/chart/amap'
 type Props = {}
 
 export default function Page({}: Props) {
-  const hash = window.location.hash
+  const hash = location.hash
 
   let baseOption
   try {
