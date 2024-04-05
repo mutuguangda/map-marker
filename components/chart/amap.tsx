@@ -43,7 +43,7 @@ export default function MapContainer({ className, option }: PropsType) {
 
   const GMap = useRef<typeof AMap | null>(null) 
 
-  // const [positions, setPositions] = useState(data.geocodes)
+  const [positions, setPositions] = useState(data.geocodes)
   // const [_, copyToClipboard] = useCopyToClipboard();
   // const { toast } = useToast()
 
@@ -52,13 +52,14 @@ export default function MapContainer({ className, option }: PropsType) {
     // window._AMapSecurityConfig = process.env.NODE_ENV === 'development'
     window._AMapSecurityConfig = process.env.NODE_ENV === 'production'
       ? { securityJsCode: '4ebbc57caa8127e6c4fc6288a5782a4c' }
-      : { serviceHost: 'http://localhost:3000/_AMapService' };
+      : { serviceHost: `${location.origin}/_AMapService` };
     AMapLoader.load({
       key: "dafe1244843ac4a6721a014970c63558",
       version: "2.0",
       plugins: ["AMap.AutoComplete"], //需要使用的的插件列表
     })
       .then((_AMap: typeof AMap) => { 
+        GMap.current = _AMap
 
         map.current = new _AMap.Map(el.current!, {
           viewMode: "2D",
@@ -70,7 +71,7 @@ export default function MapContainer({ className, option }: PropsType) {
 
         const points = option.points
         Object.keys(points).forEach((key) => {
-          setPoint(points[key])
+          setPoint(points[key], true)
         })
 
         // @ts-ignore
@@ -80,10 +81,6 @@ export default function MapContainer({ className, option }: PropsType) {
         })
         autoComplete.on('select', (e: any) => {
           const { name, location } = e.poi
-          const key = location.pos.join()
-          if (points[key]) return
-          const point = { title: name, position: location, description: '' }
-          points[key] = point
           setPoint({ title: name, position: location, description: '' })
         })
         map.current.addControl(autoComplete)
@@ -108,7 +105,17 @@ export default function MapContainer({ className, option }: PropsType) {
     return () => document.removeEventListener("keydown", down)
   })
 
-  function setPoint(point: BMapOptionType['points'][string]) {
+  function setPoint(point: BMapOptionType['points'][string], force: boolean = false) {
+    if (!force) {
+      const points = option.points
+      const key = point.position.join()
+      if (points[key]) {
+        infoWindow.current?.open(map.current!, point.position)
+        return
+      }
+      points[key] = point
+    }
+
     const marker = new GMap.current!.Marker({
       position: point.position,    
       map: map.current!
@@ -123,6 +130,7 @@ export default function MapContainer({ className, option }: PropsType) {
           defaultValue={point.description}
           onChange={(e) => {
             point.description = e.target.value
+            replaceUrl()
           }}
         />
       </div>
@@ -137,14 +145,50 @@ export default function MapContainer({ className, option }: PropsType) {
       }, 50)
     })
     marker.emit('click', { target: marker })
+    
+    replaceUrl()
+  }
+
+  const handleKeyUp: KeyboardEventHandler<HTMLInputElement> = (e) => {
+    if (e.code !== 'Enter') {
+      return
+    }
+
+    const input = (e.target as unknown as any).value
+    if (!input) {
+      return
+    }
+    fetch(`https://restapi.amap.com/v3/geocode/geo?address=${input}&output=JSON&key=9e916cb1a5436f165a8317d249c99e39`).then(res => res.json()).then(data => {
+      setPositions(data.geocodes)
+    })
+  }
+
+  const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
+    const position = positions[(e.target as unknown as any).getAttribute('data-index')]
+    const point: PointType = { 
+      title: position['formatted_address'],
+      position: position.location.split(',').map(parseFloat) as any,
+      description: '' 
+    }
+    setPoint(point)
+  }
+
+  const replaceUrl = () => {
+    const hash = utoa(JSON.stringify(option))
+    window.history.replaceState({}, '', `${location.origin}#${hash}`);
   }
 
   return (
     <div className="w-full h-full relative">
       <div className="bg-background w-96 p-3 absolute left-5 top-5 z-50 border rounded-md">
         {/* <Button onClick={handleExport}>导出</Button> */}
-        <InputSearch ref={inputSearch} />
+        <InputSearch ref={inputSearch} onKeyUp={handleKeyUp} />
         <ScrollArea className="mt-2">
+          <div className="mt-2 flex flex-col gap-2" onClick={handleClick}>
+            {positions.map((position, index) => {
+              return <div className="text-xs p-2 border" key={position.location} data-index={index}>{position.formatted_address}</div>
+            })}
+          </div>          
           <div ref={scrollContainer}></div>
         </ScrollArea>
       </div>
