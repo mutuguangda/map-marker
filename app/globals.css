@@ -77,16 +77,8 @@
 
 * {
   box-sizing: border-box;
-  /* position: relative; */
+  position: relative;
   min-width: 0;
-}
-
-body {
-  min-height: 100vh;
-  display: flex;
-  min-height: 100vh;
-  justify-content: center;
-  align-items: center;
 }
 
 h1, h2, h3, h4 {
@@ -96,3 +88,22 @@ h1, h2, h3, h4 {
 p {
   text-wrap: pretty;
 }
+
+.auto-item {
+  border: 1px solid #eee;   
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.auto-item:hover {
+  background-color: transparent;
+  border-color: #810;
+  color: #810;
+}
+
+.auto-item:last-child {
+  margin-bottom: 0;
+}
+

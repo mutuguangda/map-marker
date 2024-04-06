@@ -1,4 +1,3 @@
-"use client"
 /**
  * 源自：https://github.com/vuejs/repl/blob/6ccdf56a09e97e7c025701517620b4755cd0a343/src/utils.ts#L13
  */

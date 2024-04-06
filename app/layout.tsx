@@ -3,7 +3,6 @@ import { Noto_Serif_SC as FontSans } from "next/font/google"
 import { cn } from "@/lib/utils"
 import { Toaster } from "@/components/ui/toaster"
 import "./globals.css";
-import './design.css';
 
 const fontSans = FontSans({
   subsets: ["latin"],

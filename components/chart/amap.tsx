@@ -1,15 +1,16 @@
 "use client"
-import { KeyboardEventHandler, MouseEventHandler, useEffect, useRef, useState } from "react";
+import { KeyboardEventHandler, MouseEventHandler, memo, useEffect, useRef, useState } from "react";
 import { createRoot } from 'react-dom/client';
 import '@amap/amap-jsapi-types';
 import { InputSearch } from "../ui/input-search";
 import { ScrollArea } from '../ui/scroll-area'
 import { utoa } from "@/app/utils";
 import { Textarea } from "../ui/textarea";
+import { cloneDeep } from "lodash-es";
 
 interface PropsType {
   className?: string
-  option: BMapOptionType
+  option?: BMapOptionType
   preview?: boolean
 }
 
@@ -26,7 +27,10 @@ export interface PointType {
   position: [number, number]
 }
 
-export default function MapContainer({ className, option, preview = false }: PropsType) {
+export default memo(function MapContainer({ className, option = {
+  points: {},
+  mapStyle: ''
+}, preview = false }: PropsType) {
   const el = useRef<HTMLDivElement | null>(null)
   const map = useRef<AMap.Map | null>(null);
   const infoWindow = useRef<AMap.InfoWindow | null>(null)
@@ -37,7 +41,7 @@ export default function MapContainer({ className, option, preview = false }: Pro
 
   const GMap = useRef<typeof AMap | null>(null)
 
-  const [positions, setPositions] = useState([])
+  const [positions, setPositions] = useState<Recordable[]>([])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -72,7 +76,8 @@ export default function MapContainer({ className, option, preview = false }: Pro
           })
           autoComplete.on('select', (e: any) => {
             const { name, location } = e.poi
-            setPoint({ title: name, position: location, description: '' })
+            const position = location.toString().split(',').map(parseFloat) as any
+            setPoint({ title: name, position, description: '' })
           })
           map.current.addControl(autoComplete)
         })
@@ -143,24 +148,24 @@ export default function MapContainer({ className, option, preview = false }: Pro
         infoWindow.current?.open(map.current!, position);
       }, 50)
     })
-    marker.emit('click', { target: marker })
+    !force && marker.emit('click', { target: marker })
 
-    replaceUrl()
+    !force && replaceUrl()
   }
 
-  const handleKeyUp: KeyboardEventHandler<HTMLInputElement> = (e) => {
-    if (e.code !== 'Enter') {
-      return
-    }
+  // const handleKeyUp: KeyboardEventHandler<HTMLInputElement> = (e) => {
+  //   if (e.code !== 'Enter') {
+  //     return
+  //   }
 
-    const input = (e.target as unknown as any).value
-    if (!input) {
-      return
-    }
-    fetch(`https://restapi.amap.com/v3/geocode/geo?address=${input}&output=JSON&key=9e916cb1a5436f165a8317d249c99e39`).then(res => res.json()).then(data => {
-      setPositions(data.geocodes)
-    })
-  }
+  //   const input = (e.target as unknown as any).value
+  //   if (!input) {
+  //     return
+  //   }
+  //   fetch(`https://restapi.amap.com/v3/geocode/geo?address=${input}&output=JSON&key=9e916cb1a5436f165a8317d249c99e39`).then(res => res.json()).then(data => {
+  //     setPositions(data.geocodes)
+  //   })
+  // }
 
   const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
     const position = positions[(e.target as unknown as any).getAttribute('data-index')]
@@ -180,15 +185,16 @@ export default function MapContainer({ className, option, preview = false }: Pro
   const Control = () => {
     if (preview) return
     return (
-      <div className="bg-background w-96 p-3 absolute left-5 top-5 z-50 border rounded-md">
-        <InputSearch ref={inputSearch} onKeyUp={handleKeyUp} />
+      <div className="bg-background w-96 p-3 absolute left-5 top-5 z-50 border rounded-md shadow">
+        {/* <InputSearch ref={inputSearch} onKeyUp={handleKeyUp} /> */}
+        <InputSearch ref={inputSearch} />
         <ScrollArea className="mt-2">
-          <div className="mt-2 flex flex-col gap-2" onClick={handleClick}>
+          {/* <div className="mt-2 flex flex-col gap-2" onClick={handleClick}>
             {positions.map((position, index) => {
               return <div className="p-2 border" key={position.location} data-index={index}>{position.formatted_address}</div>
             })}
-          </div>
-          <div ref={scrollContainer}></div>
+          </div> */}
+          <div className="!left-0 !top-0 !min-w-full" ref={scrollContainer}></div>
         </ScrollArea>
       </div>
     )
@@ -203,4 +209,4 @@ export default function MapContainer({ className, option, preview = false }: Pro
       />
     </div>
   );
-}
+})

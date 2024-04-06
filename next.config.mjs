@@ -15,7 +15,7 @@ const nextConfig = {
         destination: `https://restapi.amap.com/:path*?jscode=${process.env.BMAP_SECRET_KEY}`
       },
     ] 
-  },
+  }
 };
 
 export default nextConfig;
