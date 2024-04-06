@@ -57,7 +57,7 @@ export default memo(function MapContainer({ className, option = {
           GMap.current = _AMap
 
           map.current = new _AMap.Map(el.current!, {
-            viewMode: "2D",
+            viewMode: "3D",
             zoom: 4,
             mapStyle
           });
