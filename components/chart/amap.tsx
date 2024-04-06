@@ -6,7 +6,6 @@ import { InputSearch } from "../ui/input-search";
 import { ScrollArea } from '../ui/scroll-area'
 import { utoa } from "@/app/utils";
 import { Textarea } from "../ui/textarea";
-import { cloneDeep } from "lodash-es";
 
 interface PropsType {
   className?: string
@@ -37,11 +36,10 @@ export default memo(function MapContainer({ className, option = {
   const inputSearch = useRef<HTMLInputElement | null>(null)
   const scrollContainer = useRef<HTMLDivElement | null>(null)
 
-  const mapStyle = option.mapStyle || 'amap://styles/a927524f8e540e512b9bdea1cad3d6fb'; // 使用灰色风格
-
+  const mapStyle = option.mapStyle || 'amap://styles/a927524f8e540e512b9bdea1cad3d6fb';
   const GMap = useRef<typeof AMap | null>(null)
-
   const [positions, setPositions] = useState<Recordable[]>([])
+  const [pointKey, setPointKey] = useState<string>('')
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -104,9 +102,9 @@ export default memo(function MapContainer({ className, option = {
   })
 
   function setPoint(point: BMapOptionType['points'][string], force: boolean = false) {
+    const key = point.position.join()
     if (!force) {
       const points = option.points
-      const key = point.position.join()
       if (points[key]) {
         infoWindow.current?.open(map.current!, point.position)
         return
@@ -119,8 +117,6 @@ export default memo(function MapContainer({ className, option = {
       map: map.current!
     })
     const element = document.createElement('div')
-    // @ts-ignore
-    marker.content = element
     const elementChildren = (
       <div className="flex flex-col gap-2">
         <h6 className="text-xs">{point.title}</h6>
@@ -141,12 +137,20 @@ export default memo(function MapContainer({ className, option = {
     )
     const root = createRoot(element)
     root.render(elementChildren)
+    // @ts-ignore
+    marker.element = element
+    // @ts-ignore
+    marker.content = point
     marker.on('click', (e) => {
-      infoWindow.current?.setContent(e.target.content)
-      const position = e.target.getPosition()
-      setTimeout(() => {
-        infoWindow.current?.open(map.current!, position);
-      }, 50)
+      if (preview) {
+        infoWindow.current?.setContent(e.target.element)
+        const position = e.target.getPosition()
+        setTimeout(() => {
+          infoWindow.current?.open(map.current!, position);
+        }, 50)
+        return
+      }
+      setPointKey(key)
     })
     !force && marker.emit('click', { target: marker })
 
@@ -182,13 +186,12 @@ export default memo(function MapContainer({ className, option = {
     window.history.replaceState({}, '', `${location.origin}#${hash}`);
   }
 
-  const Control = () => {
+  const Search = () => {
     if (preview) return
     return (
-      <div className="bg-background w-96 p-3 absolute left-5 top-5 z-50 border rounded-md shadow">
-        {/* <InputSearch ref={inputSearch} onKeyUp={handleKeyUp} /> */}
-        <InputSearch ref={inputSearch} />
-        <ScrollArea className="mt-2">
+      <div className="bg-background w-96 absolute left-5 top-5 z-50 rounded-md shadow">
+        <InputSearch ref={inputSearch} placeholder="搜索地点" />
+        <ScrollArea>
           {/* <div className="mt-2 flex flex-col gap-2" onClick={handleClick}>
             {positions.map((position, index) => {
               return <div className="p-2 border" key={position.location} data-index={index}>{position.formatted_address}</div>
@@ -200,9 +203,20 @@ export default memo(function MapContainer({ className, option = {
     )
   }
 
+  const Display = () => {
+    if (!pointKey) return
+    return (
+      <div className="bg-background w-96 p-3 absolute right-5 top-5 z-50 border rounded-md shadow">
+        <div className="mb-2">{option.points[pointKey].title}</div>
+        <Textarea defaultValue={option.points[pointKey].description} />
+      </div>
+    )
+  }
+
   return (
     <div className="w-full h-full relative">
-      <Control />
+      <Search />
+      <Display />
       <div
         ref={el}
         className={className}

@@ -3,15 +3,19 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 
 export interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {}
+  extends React.InputHTMLAttributes<HTMLInputElement> { }
 
 const InputSearch = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, ...props }, ref) => {
+    const [ifCommand, setIfCommand] = React.useState(true)
+
     return (
       <div className="relative">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground">
-  <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-</svg>
+          <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+        </svg>
+        {ifCommand ? <div className="absolute right-4 top-2.5 h-4 text-xs text-muted-foreground">CTRL + F</div>
+          : undefined}
         <input
           type={type}
           className={cn(
@@ -20,6 +24,14 @@ const InputSearch = React.forwardRef<HTMLInputElement, InputProps>(
           )}
           ref={ref}
           {...props}
+          onFocus={(e) => {
+            props?.onFocus && props.onFocus(e)
+            setIfCommand(false)
+          }}
+          onBlur={(e) => {
+            props?.onBlur && props.onBlur(e)
+            setIfCommand(true)
+          }}
         />
       </div>
     )

@@ -13,9 +13,9 @@ export default function Home() {
   })
   if (hash.current) {
     try {
-      baseOption.current = JSON.parse(utoa(hash.current))
-    } catch (error) {
-      console.log('无效的 hash')
+      baseOption.current = JSON.parse(atou(hash.current.slice(1)))
+    } catch {
+      console.log('无效的 hash', hash.current)
     }
   }
 
