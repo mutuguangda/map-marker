@@ -6,6 +6,13 @@ import { InputSearch } from "../ui/input-search";
 import { ScrollArea } from '../ui/scroll-area'
 import { utoa } from "@/app/utils";
 import { Textarea } from "../ui/textarea";
+import { Input } from "../ui/input";
+import EmojiPicker, { EmojiStyle } from 'emoji-picker-react';
+import { PointType } from "./types";
+import { Popover, PopoverContent } from "../ui/popover";
+import { PopoverTrigger } from "@radix-ui/react-popover";
+import Image from "next/image";
+import { useDropArea } from "react-use";
 
 interface PropsType {
   className?: string
@@ -18,12 +25,6 @@ export interface BMapOptionType {
     [key: string]: PointType
   }
   mapStyle: string
-}
-
-export interface PointType {
-  description: string,
-  title: string,
-  position: [number, number]
 }
 
 export default memo(function MapContainer({ className, option = {
@@ -40,6 +41,12 @@ export default memo(function MapContainer({ className, option = {
   const GMap = useRef<typeof AMap | null>(null)
   const [positions, setPositions] = useState<Recordable[]>([])
   const [pointKey, setPointKey] = useState<string>('')
+
+  const [bond, state] = useDropArea({
+    onFiles: files => console.log('files', files),
+    onUri: uri => console.log('uri', uri),
+    onText: text => console.log('text', text),
+  });
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -68,16 +75,17 @@ export default memo(function MapContainer({ className, option = {
           })
 
           // @ts-ignore
-          const autoComplete = new _AMap.AutoComplete({
-            input: inputSearch.current,
-            output: scrollContainer.current
-          })
-          autoComplete.on('select', (e: any) => {
-            const { name, location } = e.poi
-            const position = location.toString().split(',').map(parseFloat) as any
-            setPoint({ title: name, position, description: '' })
-          })
-          map.current.addControl(autoComplete)
+          // const autoComplete = new _AMap.AutoComplete({
+          //   input: inputSearch.current,
+          //   output: scrollContainer.current
+          // })
+          // autoComplete.on('select', (e: any) => {
+          //   const { name, location } = e.poi
+          //   console.log(e.poi)
+          //   const position = location.toString().split(',').map(parseFloat) as any
+          //   setPoint({ title: name, position, description: '' })
+          // })
+          // map.current.addControl(autoComplete)
         })
         .catch((e) => {
           console.log(e);
@@ -92,7 +100,7 @@ export default memo(function MapContainer({ className, option = {
   useEffect(() => {
     if (preview) return
     const down = (e: KeyboardEvent) => {
-      if (e.key === "q" && (e.metaKey || e.ctrlKey)) {
+      if (e.key === "f" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault()
         inputSearch.current?.focus()
       }
@@ -112,26 +120,37 @@ export default memo(function MapContainer({ className, option = {
       points[key] = point
     }
 
-    const marker = new GMap.current!.Marker({
+    const marker = new GMap.current!.Text({
       position: point.position,
-      map: map.current!
+      map: map.current!,
+      text: '🚩',
+      style: {
+        background: 'transparent',
+        border: 'none'
+      }
     })
+    marker.setLabel({
+      direction: 'top',
+      offset: new AMap.Pixel(10, 0),  //设置文本标注偏移量
+      content: point.title, //设置文本标注内容
+    });
+
     const element = document.createElement('div')
     const elementChildren = (
       <div className="flex flex-col gap-2">
         <h6 className="text-xs">{point.title}</h6>
         {
-          !preview 
-            ? 
-              <Textarea
-                defaultValue={point.description}
-                onChange={(e) => {
-                  point.description = e.target.value
-                  replaceUrl()
-                }}
-              />
+          !preview
+            ?
+            <Textarea
+              defaultValue={point.description}
+              onChange={(e) => {
+                point.description = e.target.value
+                replaceUrl()
+              }}
+            />
             :
-              <div className="text-xs">{point.description}</div>
+            <div className="text-xs">{point.description}</div>
         }
       </div>
     )
@@ -157,26 +176,29 @@ export default memo(function MapContainer({ className, option = {
     !force && replaceUrl()
   }
 
-  // const handleKeyUp: KeyboardEventHandler<HTMLInputElement> = (e) => {
-  //   if (e.code !== 'Enter') {
-  //     return
-  //   }
+  const handleKeyUp: KeyboardEventHandler<HTMLInputElement> = (e) => {
+    if (e.code !== 'Enter') {
+      return
+    }
 
-  //   const input = (e.target as unknown as any).value
-  //   if (!input) {
-  //     return
-  //   }
-  //   fetch(`https://restapi.amap.com/v3/geocode/geo?address=${input}&output=JSON&key=9e916cb1a5436f165a8317d249c99e39`).then(res => res.json()).then(data => {
-  //     setPositions(data.geocodes)
-  //   })
-  // }
+    const input = (e.target as unknown as any).value
+    if (!input) {
+      return
+    }
+    fetch(`https://restapi.amap.com/v3/geocode/geo?address=${input}&output=JSON&key=9e916cb1a5436f165a8317d249c99e39`).then(res => res.json()).then(data => {
+      console.log('data', data)
+      setPositions(data.geocodes)
+    })
+  }
 
   const handleClick: MouseEventHandler<HTMLDivElement> = (e) => {
     const position = positions[(e.target as unknown as any).getAttribute('data-index')]
     const point: PointType = {
       title: position['formatted_address'],
       position: position.location.split(',').map(parseFloat) as any,
-      description: ''
+      description: '',
+      images: [],
+      icon: '🚩'
     }
     setPoint(point)
   }
@@ -189,14 +211,16 @@ export default memo(function MapContainer({ className, option = {
   const Search = () => {
     if (preview) return
     return (
-      <div className="bg-background w-96 absolute left-5 top-5 z-50 rounded-md shadow">
-        <InputSearch ref={inputSearch} placeholder="搜索地点" />
-        <ScrollArea>
-          {/* <div className="mt-2 flex flex-col gap-2" onClick={handleClick}>
+      <div className="w-96 absolute left-5 top-5 z-50 ">
+        <div className="bg-background rounded-md">
+          <InputSearch ref={inputSearch} placeholder="搜索地点" onKeyUp={handleKeyUp} />
+        </div>
+        <ScrollArea className="mt-3 bg-background rounded-md shadow-md">
+          <div className="flex flex-col gap-2" onClick={handleClick}>
             {positions.map((position, index) => {
               return <div className="p-2 border" key={position.location} data-index={index}>{position.formatted_address}</div>
             })}
-          </div> */}
+          </div>
           <div className="!left-0 !top-0 !min-w-full" ref={scrollContainer}></div>
         </ScrollArea>
       </div>
@@ -207,8 +231,52 @@ export default memo(function MapContainer({ className, option = {
     if (!pointKey) return
     return (
       <div className="bg-background w-96 p-3 absolute right-5 top-5 z-50 border rounded-md shadow">
-        <div className="mb-2">{option.points[pointKey].title}</div>
-        <Textarea defaultValue={option.points[pointKey].description} />
+        <Popover>
+          <PopoverTrigger>
+            <div className="text-2xl p-1 hover:bg-[#E0F0FF] rounded-md mb-2">{option.points[pointKey].icon || '🚩'}</div>
+          </PopoverTrigger>
+          <PopoverContent>
+            <EmojiPicker emojiStyle={EmojiStyle.NATIVE} onEmojiClick={(emojiData) => {
+              console.log('emojiData', emojiData)
+              option.points[pointKey].icon = emojiData.emoji
+              replaceUrl()
+            }} />
+          </PopoverContent>
+        </Popover>
+        <div className="flex gap-2 items-center">
+          <Input defaultValue={option.points[pointKey].title} className="px-2" />
+          <div className="flex-shrink-0 cursor-pointer h-9 flex justify-center items-center w-9 text-white rounded-md bg-red-500 hover:text-red-100 hover:bg-red-400">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-4 h-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+            </svg>
+          </div>
+        </div>
+        <div className="flex flex-col gap-2 mt-3">
+          <div>简介</div>
+          <Textarea defaultValue={option.points[pointKey].description} className="px-2" onChange={(e) => {
+            option.points[pointKey].description = e.target.value
+            replaceUrl()
+          }} />
+        </div>
+        <div className="mt-3 flex flex-col gap-2">
+          <div>图片上传</div>
+          <div className="flex flex-wrap -m-1 flex-shrink-0">
+            {option.points[pointKey].images?.map((item, index) => {
+              return (
+                <div key={index} className="p-1 w-1/4 h-[91.6px] flex-shrink-0">
+                  <div className="w-full h-full border border-gray-500 rounded-md border-dashed">
+                    <Image src={item} alt="图片" />
+                  </div>
+                </div>
+              )
+            })}
+            <div className="p-1 w-1/4 h-[91.6px] flex-shrink-0" {...bond}>
+              <div className="w-full h-full flex items-center justify-center border border-gray-500 rounded-md border-dashed">
+                <div className="text-3xl">+</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     )
   }

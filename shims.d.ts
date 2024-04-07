@@ -1,3 +1,5 @@
+import '@amap/amap-jsapi-types';
+
 export {}
 
 declare global {
@@ -10,4 +12,6 @@ declare global {
   }
 
   type Recordable<T = any> = Record<string, T>
+
+  type AMapType = typeof AMap
 }

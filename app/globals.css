@@ -77,8 +77,6 @@
 
 * {
   box-sizing: border-box;
-  position: relative;
-  min-width: 0;
 }
 
 h1, h2, h3, h4 {
@@ -92,7 +90,7 @@ p {
 .auto-item {
   border: 1px solid #eee;   
   padding: 0.5rem;
-  margin-bottom: 0.5rem;
+  margin: 0.5rem;
   border-radius: 4px;
   font-size: 14px;
 }
@@ -101,8 +99,4 @@ p {
   background-color: transparent;
   border-color: #810;
   color: #810;
-}
-
-.auto-item:last-child {
-  margin-bottom: 0;
 }
