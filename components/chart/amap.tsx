@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 "use client"
 import { KeyboardEventHandler, MouseEventHandler, memo, useEffect, useRef, useState } from "react";
 import { createRoot } from 'react-dom/client';
@@ -11,8 +12,11 @@ import EmojiPicker, { EmojiStyle } from 'emoji-picker-react';
 import { PointType } from "./types";
 import { Popover, PopoverContent } from "../ui/popover";
 import { PopoverTrigger } from "@radix-ui/react-popover";
-import Image from "next/image";
 import { useDropArea } from "react-use";
+import { Image, Upload } from 'antd';
+import type { GetProp, UploadFile, UploadProps } from 'antd';
+import { cloneDeep } from "lodash-es";
+import { map as asyncMap } from 'radash'
 
 interface PropsType {
   className?: string
@@ -26,6 +30,8 @@ export interface BMapOptionType {
   }
   mapStyle: string
 }
+
+type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 
 export default memo(function MapContainer({ className, option = {
   points: {},
@@ -64,7 +70,8 @@ export default memo(function MapContainer({ className, option = {
           map.current = new _AMap.Map(el.current!, {
             viewMode: "3D",
             zoom: 4,
-            mapStyle
+            mapStyle,
+            showLabel: false
           });
 
           infoWindow.current = new _AMap.InfoWindow({ offset: new _AMap.Pixel(0, -30) });
@@ -229,6 +236,49 @@ export default memo(function MapContainer({ className, option = {
 
   const Display = () => {
     if (!pointKey) return
+    console.log('option.points[pointKey]',option.points[pointKey])
+    const [previewOpen, setPreviewOpen] = useState(false);
+    const [previewImage, setPreviewImage] = useState('');
+    const [fileList, setFileList] = useState<UploadFile[]>(option.points[pointKey].images || []);
+
+    const handlePreview = async (file: UploadFile) => {
+      if (!file.url && !file.preview) {
+        file.preview = await getBase64(file.originFileObj as FileType);
+      }
+
+      setPreviewImage(file.url || (file.preview as string));
+      setPreviewOpen(true);
+    };
+
+    const handleChange: UploadProps['onChange'] = async ({ fileList: newFileList }) => {
+      setFileList(newFileList);
+      option.points[pointKey].images = await asyncMap(newFileList, async (item) => {
+        const url = await getBase64(item.originFileObj as FileType)
+        return {
+          uid: item.uid,
+          name: item.name,
+          url: url,
+          type: item.type
+        }
+      })
+      replaceUrl()
+    }
+      
+    const uploadButton = (
+      <button style={{ border: 0, background: 'none' }} type="button">
+        <span className="icon-[heroicons--plus]"></span>
+      </button>
+    );
+
+    const getBase64 = (file: FileType): Promise<string> => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = (error) => reject(error);
+      });
+    }
+
     return (
       <div className="bg-background w-96 p-3 absolute right-5 top-5 z-50 border rounded-md shadow">
         <Popover>
@@ -261,7 +311,27 @@ export default memo(function MapContainer({ className, option = {
         <div className="mt-3 flex flex-col gap-2">
           <div>图片上传</div>
           <div className="flex flex-wrap -m-1 flex-shrink-0">
-            {option.points[pointKey].images?.map((item, index) => {
+            <Upload
+              listType="picture-card"
+              fileList={fileList}
+              onPreview={handlePreview}
+              onChange={handleChange}
+            >
+              {fileList.length >= 8 ? null : uploadButton}
+            </Upload>
+            {previewImage && (
+              <Image
+                wrapperStyle={{ display: 'none' }}
+                preview={{
+                  visible: previewOpen,
+                  onVisibleChange: (visible: any) => setPreviewOpen(visible),
+                  afterOpenChange: (visible: any) => !visible && setPreviewImage(''),
+                }}
+                src={previewImage}
+                alt="picture"
+              />
+            )}
+            {/* {option.points[pointKey].images?.map((item, index) => {
               return (
                 <div key={index} className="p-1 w-1/4 h-[91.6px] flex-shrink-0">
                   <div className="w-full h-full border border-gray-500 rounded-md border-dashed">
@@ -274,7 +344,7 @@ export default memo(function MapContainer({ className, option = {
               <div className="w-full h-full flex items-center justify-center border border-gray-500 rounded-md border-dashed">
                 <div className="text-3xl">+</div>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

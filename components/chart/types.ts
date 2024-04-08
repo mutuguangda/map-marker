@@ -1,3 +1,5 @@
+import { UploadFile } from "antd"
+
 export interface BMapOptionType {
   points: {
     [key: string]: PointType
@@ -10,7 +12,7 @@ export interface PointType {
   description: string,
   title: string,
   position: [number, number],
-  images?: string[],
+  images?: UploadFile[],
   createdTime?: string,
   updatedTime?: string
 }

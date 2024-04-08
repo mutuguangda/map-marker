@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Noto_Serif_SC as FontSans } from "next/font/google"
 import { cn } from "@/lib/utils"
 import { Toaster } from "@/components/ui/toaster"
+import { AntdRegistry } from '@ant-design/nextjs-registry';
 import "./globals.css";
 
 const fontSans = FontSans({
@@ -25,7 +26,9 @@ export default function RootLayout({
         'min-h-screen font-sans antialiased',
         fontSans.variable
       )}>
-        <main>{children}</main>
+        <main>
+          <AntdRegistry>{children}</AntdRegistry>
+        </main>
         <Toaster />
       </body>
     </html>
