@@ -5,21 +5,31 @@ import { cn } from "@/lib/utils"
 export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement> { }
 
-const InputSearch = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, ...props }, ref) => {
+const InputSearch = ({ className, type, ...props }: InputProps) => {
+    const ref = React.useRef<HTMLInputElement>(null)
     const [ifCommand, setIfCommand] = React.useState(true)
+
+    React.useEffect(() => {
+      if (ifCommand) {
+        document.addEventListener("keydown", (e) => {
+          if (e.ctrlKey && e.key === "f") {
+            e.preventDefault()
+            e.stopPropagation()
+            ref.current?.focus()
+          }
+        })
+      }
+    })
 
     return (
       <div className="relative">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground">
-          <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-        </svg>
+        <span className="icon-[heroicons--magnifying-glass] absolute left-2 top-2.5 h-4 w-4 text-muted-foreground"></span>
         {ifCommand ? <div className="absolute right-4 top-2.5 h-4 text-xs text-muted-foreground">CTRL + F</div>
           : undefined}
         <input
           type={type}
           className={cn(
-            "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 pl-8",
+            "flex h-9 w-full border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 pl-8 rounded-md",
             className
           )}
           ref={ref}
@@ -35,8 +45,6 @@ const InputSearch = React.forwardRef<HTMLInputElement, InputProps>(
         />
       </div>
     )
-  }
-)
-InputSearch.displayName = "InputSearch"
+}
 
 export { InputSearch }

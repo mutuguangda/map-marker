@@ -4,6 +4,7 @@ import { useCopyToClipboard } from "react-use";
 import { useToast } from "@/components/ui/use-toast";
 import { atou, utoa } from "./utils";
 import MapContainer, { BMapOptionType } from "@/components/chart/amap";
+import { Panel } from "./panel";
 
 export default function Home() {
   const hash = useRef(typeof window !== 'undefined' ? window.location.hash : '')
@@ -45,6 +46,9 @@ export default function Home() {
   })
 
   return (
-    <MapContainer className="w-screen h-screen" option={baseOption.current} />
+    <>
+      <Panel />
+      <MapContainer className="w-screen h-screen" option={baseOption.current} />
+    </>
   );
 }

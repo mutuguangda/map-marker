@@ -55,7 +55,7 @@ export default memo(function MapContainer({ className, option = {
   });
 
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    if (typeof window === 'undefined' || map.current) return
     // @ts-ignore
     window._AMapSecurityConfig = { serviceHost: `${location.origin}/_AMapService` }
     import('@amap/amap-jsapi-loader').then(AMapLoader => {
@@ -353,8 +353,8 @@ export default memo(function MapContainer({ className, option = {
 
   return (
     <div className="w-full h-full relative">
-      <Search />
-      <Display />
+      {/* <Search /> */}
+      {/* <Display /> */}
       <div
         ref={el}
         className={className}
