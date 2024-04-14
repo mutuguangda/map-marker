@@ -13,6 +13,7 @@
     "@ant-design/nextjs-registry": "^1.0.0",
     "@hookform/resolvers": "^3.3.4",
     "@iconify-json/heroicons": "^1.1.20",
+    "@notionhq/client": "^2.2.15",
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-popover": "^1.0.7",
     "@radix-ui/react-scroll-area": "^1.0.5",
