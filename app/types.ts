@@ -8,11 +8,13 @@ export interface BMapOptionType {
 }
 
 export interface PointType {
+  id?: string,
   icon?: string,
   description: string,
   title: string,
-  position: [number, number],
+  location: [number, number],
   images?: UploadFile[],
   createdTime?: string,
   updatedTime?: string
+  isSyncToNotion?: boolean
 }

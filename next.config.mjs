@@ -12,7 +12,7 @@ const nextConfig = {
       },
       {
         source: '/_AMapService/:path*',
-        destination: `https://restapi.amap.com/:path*?jscode=${process.env.BMAP_SECRET_KEY}`
+        destination: `https://restapi.amap.com/:path*?jscode=${process.env.BMAP_SECRET_KEY}&key=${process.env.BMAP_API_KEY}`
       },
     ] 
   }

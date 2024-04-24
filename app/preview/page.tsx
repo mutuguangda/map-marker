@@ -1,7 +1,7 @@
 "use client"
 import * as React from 'react'
 import { atou } from '../utils'
-import MapContainer from '@/components/chart/amap'
+import MapContainer from '@/app/amap'
 
 export default function Page() {
   const hash = typeof window !== 'undefined' ? window.location.hash: ''

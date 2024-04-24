@@ -1,7 +1,6 @@
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
-import { MouseEventHandler, useState } from 'react'
 
 export default function Aside({ activeKey, onNavItemClick }: { activeKey: 'search' | 'point' | 'setting', onNavItemClick: (key: 'search' | 'point' | 'setting') => void}) {
 

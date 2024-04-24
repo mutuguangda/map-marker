@@ -1,12 +1,21 @@
-import Aside from "./aside";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { InputSearch } from "@/components/ui/input-search";
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { listPoint } from "./notion";
+import Aside from "./aside";
+import { Search } from "./search";
+import { PointType } from "../types";
+import { setZoomAndCenter } from '../amap'
 
-export function Panel() {
+type PropsType = {
+  onClickSearchItem: (point: PointType) => void;
+  pointList: PointType[];
+}
+
+export function Panel({
+  onClickSearchItem,
+  pointList
+}: PropsType) {
   const [activeKey, setActiveKey] = useState<"search" | "point" | "setting">(
     "search"
   );
@@ -14,40 +23,21 @@ export function Panel() {
     setActiveKey(key);
   };
 
-  const notionList = [
-    {
-      id: 1,
-      title: "长湴",
-      description:
-        "长湴是位于中国广东省广州市天河区的一个大型商业区，由广州市长湴置业有限公司投资建设。",
-    },
-  ];
-
-  useEffect(() => {
-    // 获取默认标点
-    listPoint().then((res) => {
-      console.log(res);
-    });
-  })
-
   return (
-    <div className="h-[588px] fixed z-10 left-5 top-5 flex border rounded-md">
+    <div className="h-[588px] fixed z-10 left-5 top-5 flex border rounded-md bg-background">
       <Aside activeKey={activeKey} onNavItemClick={handleNavItemClick} />
       <div className="w-80 p-3 h-full">
         <div className={activeKey === "search" ? "block" : "hidden"}>
           <div className="bg-background rounded-md">
-            <InputSearch placeholder="搜索地点" />
+            <Search onClickSearchItem={onClickSearchItem} />
           </div>
-          <ScrollArea className="mt-2">
-            <span className="text-sm">暂无数据</span>
-          </ScrollArea>
         </div>
         <div className={activeKey === "point" ? "block" : "hidden"}>
           <h3 className="text-lg font-bold mb-2">标点</h3>
           <ScrollArea>
-            {notionList.map((item) => {
+            {pointList.map((item) => {
               return (
-                <div className="p-2 rounded-md border" key={item.id}>
+                <div className="p-2 rounded-md border" key={item.id} onClick={() => setZoomAndCenter(8, item.location)}>
                   <div className="text-sm">{item.title}</div>
                   <div className="mt-1 text-xs text-gray-500">
                     {item.description}
