@@ -16,4 +16,5 @@ export interface PointType {
   images?: UploadFile[],
   createdTime?: string,
   updatedTime?: string
+  address: string
 }

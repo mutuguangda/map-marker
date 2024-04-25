@@ -80,13 +80,12 @@ export default function MapContainer({
 
   useEffect(() => {
     option.points.forEach((point) => {
-      const marker = createMarker({
+      createMarker({
         point,
         preview,
         onClickMarker,
         display: false,
       });
-      markers[point.location.toString()] = marker;
     });
   }, [onClickMarker, option.points, preview])
 
@@ -127,6 +126,7 @@ export function createMarker({
     //   border: "none",
     // },
   });
+  markers[point.location.toString()] = marker;
   marker.setLabel({
     direction: 'top-center',
     offset: [0, -10], //设置文本标注偏移量
@@ -193,12 +193,11 @@ export function updateMarker(point: PointType) {
     throw new Error("Marker not found");
   }
   AMapInstance.remove(preMarker);
-  const marker = createMarker({
+  createMarker({
     point,
     // @ts-ignore
     onClickMarker: preMarker.onClickMarker
   })
-  markers[point.location.toString()] = marker
 }
 
 export function setZoomAndCenter(zoom: number, center: [number, number]) {
