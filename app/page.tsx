@@ -8,7 +8,7 @@ import Display from "./display";
 import { PointType } from "./types";
 import { removeMarker } from "./amap";
 import { atou, utoa } from "./utils";
-import { createOrUpdatePointToNotion, listPointFromNotion } from "./api";
+import { createPointToNotion, listPointFromNotion, updatePointToNotion } from "./api";
 import { useImmer } from "use-immer";
 
 export default function Home() {
@@ -90,9 +90,11 @@ export default function Home() {
 
   const onOk = (point: PointType) => {
     updateMarker(point);
-    createOrUpdatePointToNotion(point).then((res) => {
+    return new Promise((resolve) => {
+      return point.id ? updatePointToNotion(point) : createPointToNotion(point);
+    }).then(res => {
       console.log('res',res)
-    });
+    })
   }
 
   const onCancel = () => {

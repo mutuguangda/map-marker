@@ -23,7 +23,7 @@ export interface BMapOptionType {
 export let AMap: AMapType | null = null;
 export let AMapInstance: AMap.Map | null = null;
 export let infoWindow: AMap.InfoWindow | null = null;
-export const markers: { [k: string]: AMap.Text } = {};
+export const markers: { [k: string]: AMap.Marker } = {};
 
 // const { BMAP_STYLE_ID } = getEnvConfig()
 
@@ -117,18 +117,19 @@ export function createMarker({
     throw new Error("AMap is not loaded");
   }
 
-  const marker = new AMap.Text({
+  const marker = new AMap.Marker({
     position: point.location,
     map: AMapInstance,
-    text: point.icon,
-    style: {
-      background: "transparent",
-      border: "none",
-    },
+    // text: ,
+    // content: point.icon
+    // style: {
+    //   background: "transparent",
+    //   border: "none",
+    // },
   });
   marker.setLabel({
-    direction: "top",
-    offset: new AMap.Pixel(10, 0), //设置文本标注偏移量
+    direction: 'top-center',
+    offset: [0, -10], //设置文本标注偏移量
     content: point.title, //设置文本标注内容
   });
   const element = document.createElement("div");
@@ -153,8 +154,6 @@ export function createMarker({
   marker.element = element;
   // @ts-ignore
   marker.onClickMarker = onClickMarker;
-  // @ts-ignore
-  marker.isSyncToNotion = !!point.isSyncToNotion;
   marker.on("click", (e) => {
     if (preview) {
       infoWindow?.setContent(e.target.element);

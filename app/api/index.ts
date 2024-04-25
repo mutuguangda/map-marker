@@ -29,13 +29,12 @@ export async function listPointFromNotion() {
       description: properties.Description.rich_text[0].text.content,
       updatedTime: properties.UpdatedTime.last_edited_time,
       location: properties.Location.rich_text?.[0]?.text.content.split(',').map(parseFloat),
-      isSyncToNotion: true
     };
   });
   return result;
 }
 
-export async function createOrUpdatePointToNotion(point: PointType) {
+export async function createPointToNotion(point: PointType) {
   const databaseId = process.env.NOTION_DATABASE_ID;
   if (!databaseId) {
     throw new Error("NOTION_DATABASE_ID is not set");
@@ -48,6 +47,53 @@ export async function createOrUpdatePointToNotion(point: PointType) {
     parent: {
       type: "database_id",
       database_id: databaseId,
+    },
+    properties: {
+      Name: {
+        title: [
+          {
+            text: {
+              content: point.title,
+            }
+          }
+        ]
+      },
+      Description: {
+        rich_text: [
+          {
+            text: {
+              content: point.description,
+            },
+          },
+        ],
+      },
+      Location: {
+        rich_text: [
+          {
+            text: {
+              content: point.location.join(','),
+            },
+          },
+        ],
+      }
+    },
+  });
+  return response
+}
+
+export async function updatePointToNotion(point: PointType) {
+  const databaseId = process.env.NOTION_DATABASE_ID;
+  if (!databaseId) {
+    throw new Error("NOTION_DATABASE_ID is not set");
+  }
+  if (!point.id) {
+    throw new Error("Point id is not set");
+  }
+  const response = await notion.pages.update({
+    page_id: point.id,
+    icon: {
+      type: "emoji",
+      emoji: point.icon as any || "📌",
     },
     properties: {
       Name: {
