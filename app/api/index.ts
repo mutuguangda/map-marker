@@ -29,6 +29,7 @@ export async function listPointFromNotion() {
       description: properties.Description.rich_text[0].text.content,
       updatedTime: properties.UpdatedTime.last_edited_time,
       location: properties.Location.rich_text?.[0]?.text.content.split(',').map(parseFloat),
+      address: properties.Address.rich_text?.[0]?.text.content
     };
   });
   return result;
@@ -57,6 +58,15 @@ export async function createPointToNotion(point: PointType) {
             }
           }
         ]
+      },
+      Address: {
+        rich_text: [
+          {
+            text: {
+              content: point.address,
+            },
+          },
+        ],
       },
       Description: {
         rich_text: [
@@ -110,6 +120,15 @@ export async function updatePointToNotion(point: PointType) {
           {
             text: {
               content: point.description,
+            },
+          },
+        ],
+      },
+      Address: {
+        rich_text: [
+          {
+            text: {
+              content: point.address,
             },
           },
         ],

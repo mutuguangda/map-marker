@@ -10,6 +10,7 @@ import { removeMarker } from "./amap";
 import { atou, utoa } from "./utils";
 import { createPointToNotion, listPointFromNotion, updatePointToNotion } from "./api";
 import { useImmer } from "use-immer";
+import { cloneDeep } from "lodash-es";
 
 export default function Home() {
   // const hash = useRef(
@@ -28,8 +29,8 @@ export default function Home() {
   // }
 
   // 会触发视图更新
-  const [_, copyToClipboard] = useCopyToClipboard();
-  const { toast } = useToast();
+  // const [_, copyToClipboard] = useCopyToClipboard();
+  // const { toast } = useToast();
 
   const [mapOption, setMapOption] = useImmer<BMapOptionType>({
     mapStyle: process.env.BMAP_STYLE_ID,

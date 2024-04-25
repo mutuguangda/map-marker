@@ -87,6 +87,9 @@ export default function MapContainer({
         display: false,
       });
     });
+    return () => {
+      AMapInstance && removeAllMarker()
+    };
   }, [onClickMarker, option.points, preview])
 
   const replaceUrl = () => {
@@ -112,6 +115,7 @@ export function createMarker({
   onClickMarker?: (e: any) => void;
   display?: boolean;
 }) {
+  console.log('**Create Marker**')
   if (!AMap || !AMapInstance) {
     throw new Error("AMap is not loaded");
   }
