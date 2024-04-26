@@ -87,6 +87,10 @@ export default function Display({ isDetail, point, onRemove, onOk, onCancel }: P
         </div>
       </div>
       <div className="flex flex-col gap-2 mt-3">
+        <div>地址</div>
+        <div>{ form.address || '--' }</div>
+      </div>
+      <div className="flex flex-col gap-2 mt-3">
         <div>简介</div>
         <Textarea className="px-2" value={form.description} onChange={(e) => {
           setForm((draft) => {

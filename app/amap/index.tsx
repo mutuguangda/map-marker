@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 "use client";
-import { KeyboardEventHandler, useEffect, useRef, useState } from "react";
+import { KeyboardEventHandler, useEffect, useRef, useState, forwardRef, memo } from "react";
 import { createRoot } from "react-dom/client";
 import "@amap/amap-jsapi-types";
 import { utoa } from "../utils";
@@ -23,11 +23,13 @@ export interface BMapOptionType {
 export let AMap: AMapType | null = null;
 export let AMapInstance: AMap.Map | null = null;
 export let infoWindow: AMap.InfoWindow | null = null;
-export const markers: { [k: string]: AMap.Marker } = {};
+export let markers: { [k: string]: AMap.Marker } = {};
 
 // const { BMAP_STYLE_ID } = getEnvConfig()
 
-export default function MapContainer({
+export default memo(forwardRef(MapContainer))
+
+function MapContainer({
   className,
   option = {
     mapStyle: '',
@@ -79,6 +81,7 @@ export default function MapContainer({
   }, [option.mapStyle]);
 
   useEffect(() => {
+    // if (AMapInstance) return
     option.points.forEach((point) => {
       createMarker({
         point,
@@ -88,6 +91,7 @@ export default function MapContainer({
       });
     });
     return () => {
+      console.log('create marker destroy')
       AMapInstance && removeAllMarker()
     };
   }, [onClickMarker, option.points, preview])
@@ -115,20 +119,18 @@ export function createMarker({
   onClickMarker?: (e: any) => void;
   display?: boolean;
 }) {
-  console.log('**Create Marker**')
+  console.log('**Create Marker**', point)
   if (!AMap || !AMapInstance) {
     throw new Error("AMap is not loaded");
+  }
+  if (markers[point.location.toString()]) {
+    throw new Error('Marker already exists')
   }
 
   const marker = new AMap.Marker({
     position: point.location,
     map: AMapInstance,
-    // text: ,
-    // content: point.icon
-    // style: {
-    //   background: "transparent",
-    //   border: "none",
-    // },
+    content: point.icon
   });
   markers[point.location.toString()] = marker;
   marker.setLabel({
@@ -185,6 +187,7 @@ export function removeAllMarker() {
   if (!AMapInstance) {
     throw new Error("AMap is not loaded");
   }
+  markers = {}
   AMapInstance.clearMap();
 }
 
