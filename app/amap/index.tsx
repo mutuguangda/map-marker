@@ -23,7 +23,7 @@ export interface BMapOptionType {
 export let AMap: AMapType | null = null;
 export let AMapInstance: AMap.Map | null = null;
 export let infoWindow: AMap.InfoWindow | null = null;
-export let markers: { [k: string]: AMap.Marker } = {};
+export let markers: { [k: string]: AMap.Marker | null } = {};
 
 // const { BMAP_STYLE_ID } = getEnvConfig()
 
@@ -81,7 +81,6 @@ function MapContainer({
   }, [option.mapStyle]);
 
   useEffect(() => {
-    // if (AMapInstance) return
     option.points.forEach((point) => {
       createMarker({
         point,
@@ -119,12 +118,11 @@ export function createMarker({
   onClickMarker?: (e: any) => void;
   display?: boolean;
 }) {
-  console.log('**Create Marker**', point)
   if (!AMap || !AMapInstance) {
     throw new Error("AMap is not loaded");
   }
   if (markers[point.location.toString()]) {
-    throw new Error('Marker already exists')
+    setZoomAndCenter(point)
   }
 
   const marker = new AMap.Marker({
@@ -132,10 +130,11 @@ export function createMarker({
     map: AMapInstance,
     content: point.icon
   });
+  console.log('**Create Marker**', point)
   markers[point.location.toString()] = marker;
   marker.setLabel({
     direction: 'top-center',
-    offset: [0, -10], //设置文本标注偏移量
+    offset: [0, 0],
     content: point.title, //设置文本标注内容
   });
   const element = document.createElement("div");
@@ -159,7 +158,7 @@ export function createMarker({
   // @ts-ignore
   marker.element = element;
   // @ts-ignore
-  marker.onClickMarker = onClickMarker;
+  marker.point = point;
   marker.on("click", (e) => {
     if (preview) {
       infoWindow?.setContent(e.target.element);
@@ -181,6 +180,7 @@ export function removeMarker(point: PointType) {
   const marker = markers[point.location.toString()];
   if (!marker) return
   AMapInstance.remove(marker);
+  markers[point.location.toString()] = null
 }
 
 export function removeAllMarker() {
@@ -200,16 +200,25 @@ export function updateMarker(point: PointType) {
     throw new Error("Marker not found");
   }
   AMapInstance.remove(preMarker);
+  markers[point.location.toString()] = null
   createMarker({
     point,
     // @ts-ignore
-    onClickMarker: preMarker.onClickMarker
+    onClickMarker: preMarker.point?.onClickMarker
   })
 }
 
-export function setZoomAndCenter(zoom: number, center: [number, number]) {
+export function setZoomAndCenter(point: PointType, zoom: number = 8) {
   if (!AMapInstance) {
     throw new Error("AMap is not loaded");
   }
-  AMapInstance.setZoomAndCenter(zoom, center);
+  AMapInstance.setZoomAndCenter(zoom, point.location);
+}
+
+export function isPointExsit(point: PointType) {
+  return !markers[point.location.toString()]
+}
+
+export function getMarker(point: PointType) {
+  return markers[point.location.toString()]
 }

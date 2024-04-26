@@ -2,7 +2,7 @@
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useCopyToClipboard } from "react-use";
 import { useToast } from "@/components/ui/use-toast";
-import MapContainer, { BMapOptionType, createMarker, updateMarker } from "./amap";
+import MapContainer, { BMapOptionType, createMarker, getMarker, isPointExsit, markers, setZoomAndCenter, updateMarker } from "./amap";
 import { Panel } from "./panel";
 import Display from "./display";
 import { PointType } from "./types";
@@ -76,6 +76,13 @@ export default function Home() {
   };
 
   const onClickSearchItem = (point: PointType) => {
+    const marker = getMarker(point);
+    if (marker) {
+      setZoomAndCenter(point)
+      // @ts-ignore
+      setCurrentPoint(marker.point)
+      return
+    }
     setCurrentPoint(point);
     createMarker({
       preview: false,

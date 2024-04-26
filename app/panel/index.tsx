@@ -37,7 +37,7 @@ export function Panel({
           <ScrollArea>
             {pointList.map((item) => {
               return (
-                <div className="p-2 rounded-md border" key={item.id} onClick={() => setZoomAndCenter(8, item.location)}>
+                <div className="p-2 rounded-md border" key={item.id} onClick={() => setZoomAndCenter(item)}>
                   <div className="text-sm">{item.title}</div>
                   <div className="mt-1 text-xs text-gray-500">
                     {item.description}
