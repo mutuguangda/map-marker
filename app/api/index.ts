@@ -161,3 +161,12 @@ export async function removePointFromNotion(point: PointType) {
   });
   return response
 }
+
+export async function getPointDetailFromNotion(point: PointType) {
+  if (!point.id) {
+    throw new Error("Point id is not set")
+  } 
+  return notion.blocks.children.list({
+    block_id: point.id,
+  });
+}

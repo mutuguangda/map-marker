@@ -14,8 +14,10 @@ interface PropsType {
   option?: BMapOptionType;
   preview?: boolean;
   onMarkerClick: ({ e, point }: { e: any; point: PointType }) => void;
-  onMarkerChange: (point: PointType) => void;
+  onMarkerChange?: (point: PointType) => void;
   onMarkerRemove: (point: PointType) => void;
+  onMarkerOk: (point: PointType) => Promise<any>;
+  onMarkerCancel: (point: PointType) => void;
 }
 
 export interface BMapOptionType {
@@ -30,7 +32,7 @@ export let markers: { [k: string]: AMap.Marker | null } = {};
 
 // const { BMAP_STYLE_ID } = getEnvConfig()
 
-export default memo(forwardRef(MapContainer))
+export default memo(MapContainer)
 
 function MapContainer({
   className,
@@ -42,6 +44,8 @@ function MapContainer({
   onMarkerClick,
   onMarkerChange,
   onMarkerRemove,
+  onMarkerOk,
+  onMarkerCancel,
 }: PropsType) {
   const el = useRef<HTMLDivElement | null>(null);
 
@@ -71,7 +75,7 @@ function MapContainer({
             });
   
             infoWindow = new AMap.InfoWindow({
-              offset: new AMap.Pixel(0, -30),
+              offset: new AMap.Pixel(0, -4),
               isCustom: true
             });
           })
@@ -92,8 +96,10 @@ function MapContainer({
         point,
         preview,
         onMarkerClick,
-        onMarkerChange,
+        // onMarkerChange,
         onMarkerRemove,
+        onMarkerOk,
+        onMarkerCancel,
         display: false,
       });
     });
@@ -115,7 +121,7 @@ function MapContainer({
   );
 }
 
-export type CreateMarkerPropsType = Pick<PropsType, 'preview' | 'onMarkerChange' | 'onMarkerClick' | 'onMarkerRemove'> & { display?: boolean, point: PointType }
+export type CreateMarkerPropsType = Omit<PropsType, 'className' | 'option'> & { display?: boolean, point: PointType }
 
 export function createMarker({
   point,
@@ -123,6 +129,8 @@ export function createMarker({
   onMarkerClick,
   onMarkerChange,
   onMarkerRemove,
+  onMarkerOk,
+  onMarkerCancel,
   display = false,
 }: CreateMarkerPropsType) {
   if (!AMap || !AMapInstance) {
@@ -143,28 +151,36 @@ export function createMarker({
   display && setZoomAndCenter(point)
   marker.setLabel({
     direction: 'top-center',
-    offset: [0, 0],
+    offset: [0, -4],
     content: point.title, //设置文本标注内容
   });
   const element = document.createElement("div");
-  const elementChildren = <Display 
-    point={point} 
-    isDetail={false} 
-    onChange={onMarkerChange} 
-    onRemove={(point) => {
-      infoWindow?.close();
-      onMarkerRemove(point)
-    }} 
-    onClickAway={() => {
-      infoWindow?.close();
-    }}
-  />
+  const elementChildren = (
+    <Display 
+      point={point} 
+      isDetail={false} 
+      onRemove={(point) => {
+        infoWindow?.close();
+        onMarkerRemove(point)
+      }} 
+      // onClickAway={() => {
+      //   infoWindow?.close();
+      // }}
+      onOk={onMarkerOk}
+      onCancel={onMarkerCancel}
+    />
+  )
   const root = createRoot(element);
   root.render(elementChildren);
   // @ts-ignore
   marker.element = element;
   // @ts-ignore
-  marker.point = point;
+  marker.event = {
+    onMarkerCancel,
+    onMarkerClick,
+    onMarkerOk,
+    onMarkerRemove
+  } 
   marker.on("click", (e) => {
     setZoomAndCenter(point)
     infoWindow?.setContent(e.target.element);
@@ -209,7 +225,7 @@ export function updateMarker(point: PointType) {
   createMarker({
     point,
     // @ts-ignore
-    onMarkerClick: preMarker.point?.onMarkerClick
+    ...preMarker.event
   })
 }
 
@@ -226,4 +242,8 @@ export function isPointExsit(point: PointType) {
 
 export function getMarker(point: PointType) {
   return markers[point.location.toString()]
+}
+
+export function closeInfoWindow() {
+  infoWindow?.close();
 }

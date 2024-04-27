@@ -2,7 +2,7 @@
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useCopyToClipboard } from "react-use";
 import { useToast } from "@/components/ui/use-toast";
-import MapContainer, { BMapOptionType, createMarker, getMarker, isPointExsit, markers, setZoomAndCenter, updateMarker } from "./amap";
+import MapContainer, { BMapOptionType, closeInfoWindow, createMarker, getMarker, isPointExsit, markers, setZoomAndCenter, updateMarker } from "./amap";
 import { Panel } from "./panel";
 import Display from "./display";
 import { PointType } from "./types";
@@ -89,6 +89,15 @@ export default function Home() {
     removePointFromNotion(point)
   };
 
+  const onMarkerOk = async (point: PointType) => {
+    updateMarker(point);
+    return point.id ? updatePointToNotion(point) : createPointToNotion(point);
+  };
+
+  const onMarkerCancel = () => {
+    closeInfoWindow()
+  };
+
   const onClickSearchItem = (point: PointType) => {
     const marker = getMarker(point);
     if (marker) {
@@ -99,8 +108,10 @@ export default function Home() {
       preview: false,
       point,
       onMarkerClick,
-      onMarkerChange,
+      // onMarkerChange,
       onMarkerRemove,
+      onMarkerOk,
+      onMarkerCancel,
       display: true
     });
   };
@@ -112,8 +123,10 @@ export default function Home() {
         className="w-screen h-screen"
         option={mapOption}
         onMarkerClick={onMarkerClick}
-        onMarkerChange={onMarkerChange}
+        // onMarkerChange={onMarkerChange}
         onMarkerRemove={onMarkerRemove}
+        onMarkerOk={onMarkerOk}
+        onMarkerCancel={onMarkerCancel}
       />
     </>
   );

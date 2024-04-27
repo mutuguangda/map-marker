@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@9gustin/react-notion-render": "^3.11.3",
     "@amap/amap-jsapi-loader": "^1.0.1",
     "@ant-design/nextjs-registry": "^1.0.0",
     "@hookform/resolvers": "^3.3.4",
@@ -33,6 +34,7 @@
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.51.3",
+    "react-notion-x": "^6.16.0",
     "react-use": "^17.5.0",
     "tailwind-merge": "^2.2.2",
     "tailwindcss-animate": "^1.0.7",

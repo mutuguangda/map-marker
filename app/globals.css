@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --background: #F9F7F1;
+    --background: #f9f7f1;
     --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
@@ -13,7 +13,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-  --primary: 222.2 47.4% 11.2%;
+    --primary: 222.2 47.4% 11.2%;
     --primary-foreground: 210 40% 98%;
 
     --secondary: 210 40% 96.1%;
@@ -75,11 +75,31 @@
   }
 }
 
-* {
-  box-sizing: border-box;
+@layer base {
+  h1 {
+    @apply text-2xl;
+  }
+  h2 {
+    @apply text-xl;
+  }
+  h3 {
+    @apply text-lg;
+  }
+  h4 {
+    @apply text-base;
+  }
+  h5 {
+    @apply text-sm;
+  }
+  h6 {
+    @apply text-xs;
+  }
 }
 
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   text-wrap: balance;
 }
 
@@ -88,7 +108,7 @@ p {
 }
 
 .auto-item {
-  border: 1px solid #eee;   
+  border: 1px solid #eee;
   padding: 0.5rem;
   margin: 0.5rem;
   border-radius: 4px;

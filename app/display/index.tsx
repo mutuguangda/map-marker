@@ -1,81 +1,134 @@
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import EmojiPicker, { EmojiStyle } from "emoji-picker-react";
 import { Input } from "@/components/ui/input";
 import { PointType } from "../types";
 import { useImmer } from "use-immer";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useClickAway } from "react-use";
+import { Button, Drawer } from "antd";
+import Notion from "./point-detail";
+import PointDetail from "./point-detail";
 
 type PropsType = {
-  isDetail: boolean
-  point: PointType
-  onRemove: (point: PointType) => void
-  onChange: (point: PointType) => void
-  onClickAway: () => void
-}
+  point: PointType;
+  onRemove: (point: PointType) => void;
+  onChange?: (point: PointType) => void;
+  onClickAway?: () => void;
+  onOk: (point: PointType) => Promise<any>;
+  onCancel: (point: PointType) => void;
+};
 
-export default function Display({ isDetail, point, onRemove, onChange, onClickAway } : PropsType) {
-  const isChange = useRef(false)
-  const [form, _setForm] = useImmer(point)
+export default function Display({
+  point,
+  onRemove,
+  onChange,
+  onClickAway,
+  onOk,
+  onCancel,
+}: PropsType) {
+  const [form, _setForm] = useImmer(point);
+  const [loading, setLoading] = useState(false);
+  const [disabled, setDisabled] = useState(true);
 
-  if (isChange.current) {
-    onChange(form) 
-    isChange.current = false
-  }
+  const [open, setOpen] = useState(false);
 
   const setForm = (fn: (draft: PointType) => void) => {
     _setForm((draft) => {
-      fn(draft)
-    })
-    isChange.current = true
-  }
+      fn(draft);
+    });
+    setDisabled(false);
+  };
 
   const ref = useRef(null);
   useClickAway(ref, () => {
-    onClickAway()
+    onClickAway && onClickAway();
   });
 
+  const handleOk = async () => {
+    setLoading(true);
+    await onOk(form);
+    setLoading(false);
+    setDisabled(true);
+  };
+
   return (
+    <>
     <div ref={ref} className="bg-background w-96 p-3 border rounded-md shadow">
-      <Popover>
-        <PopoverTrigger>
-          <div className="text-2xl p-1 hover:bg-[#E0F0FF] rounded-md mb-2">{ form.icon  || '🚩'  }</div>
-        </PopoverTrigger>
-        <PopoverContent>
-          <EmojiPicker emojiStyle={EmojiStyle.NATIVE} onEmojiClick={(emojiData) => {
-            setForm((draft) => {
-              draft.icon = emojiData.emoji
-            })
-          }} />
-        </PopoverContent>
-      </Popover>
+      <div className="mb-2 flex justify-between items-center">
+        <Popover>
+          <PopoverTrigger>
+            <div className="text-2xl p-1 hover:bg-[#E0F0FF] rounded-md">
+              {form.icon || "🚩"}
+            </div>
+          </PopoverTrigger>
+          <PopoverContent>
+            <EmojiPicker
+              emojiStyle={EmojiStyle.NATIVE}
+              onEmojiClick={(emojiData) => {
+                setForm((draft) => {
+                  draft.icon = emojiData.emoji;
+                });
+              }}
+            />
+          </PopoverContent>
+        </Popover>
+        <div className="text-2xl leading-6 p-1 hover:bg-[#E0F0FF] rounded-md cursor-pointer" onClick={() => setOpen(true)}>
+          <span className="icon-[heroicons--chevron-right-16-solid]"></span>
+        </div>
+      </div>
       <div className="flex gap-2 items-center">
-        <Input className="px-2" value={form.title} onChange={(e) => {
-          setForm((draft) => {
-            draft.title = e.target.value
-          })
-        }} />
-        <div className="flex-shrink-0 cursor-pointer h-9 flex justify-center items-center w-9 text-white rounded-md bg-red-500 hover:text-red-100 hover:bg-red-400" onClick={() => onRemove(point)}>
+        <Input
+          className="px-2"
+          value={form.title}
+          onChange={(e) => {
+            setForm((draft) => {
+              draft.title = e.target.value;
+            });
+          }}
+        />
+        <div
+          className="flex-shrink-0 cursor-pointer h-9 flex justify-center items-center w-9 text-white rounded-md bg-red-500 hover:text-red-100 hover:bg-red-400"
+          onClick={() => onRemove(point)}
+        >
           <span className="icon-[heroicons--trash]"></span>
         </div>
       </div>
       <div className="flex flex-col gap-2 mt-3">
         <div>地址</div>
-        <div>{ form.address || '--' }</div>
+        <div>{form.address || "--"}</div>
       </div>
       <div className="flex flex-col gap-2 mt-3">
         <div>简介</div>
-        <Textarea 
-          className="px-2 resize-none" 
+        <Textarea
+          className="px-2 resize-none"
           value={form.description}
           onChange={(e) => {
             setForm((draft) => {
-              draft.description = e.target.value
-            })
-          }} 
+              draft.description = e.target.value;
+            });
+          }}
         />
       </div>
+      <div className="flex mt-5 justify-end gap-2">
+        <Button
+          onClick={handleOk}
+          type="primary"
+          loading={loading}
+          disabled={disabled}
+        >
+          确认
+        </Button>
+        <Button onClick={() => onCancel(form)}>取消</Button>
+      </div>
     </div>
-  )
+    <Drawer title={point.title} open={open} size="large" onClose={() => setOpen(false)}>
+      <PointDetail point={point} />
+    </Drawer>
+    </>
+  );
 }
