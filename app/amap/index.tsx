@@ -7,12 +7,15 @@ import { utoa } from "../utils";
 import { Textarea } from "../../components/ui/textarea";
 import { PointType } from "../types";
 import { getEnvConfig } from "../utils/env";
+import Display from "../display";
 
 interface PropsType {
   className?: string;
   option?: BMapOptionType;
   preview?: boolean;
-  onClickMarker: ({ e, point }: { e: any; point: PointType }) => void;
+  onMarkerClick: ({ e, point }: { e: any; point: PointType }) => void;
+  onMarkerChange: (point: PointType) => void;
+  onMarkerRemove: (point: PointType) => void;
 }
 
 export interface BMapOptionType {
@@ -36,7 +39,9 @@ function MapContainer({
     points: [],
   },
   preview = false,
-  onClickMarker,
+  onMarkerClick,
+  onMarkerChange,
+  onMarkerRemove,
 }: PropsType) {
   const el = useRef<HTMLDivElement | null>(null);
 
@@ -67,6 +72,7 @@ function MapContainer({
   
             infoWindow = new AMap.InfoWindow({
               offset: new AMap.Pixel(0, -30),
+              isCustom: true
             });
           })
           .catch((e) => {
@@ -85,7 +91,9 @@ function MapContainer({
       createMarker({
         point,
         preview,
-        onClickMarker,
+        onMarkerClick,
+        onMarkerChange,
+        onMarkerRemove,
         display: false,
       });
     });
@@ -93,7 +101,7 @@ function MapContainer({
       console.log('create marker destroy')
       AMapInstance && removeAllMarker()
     };
-  }, [onClickMarker, option.points, preview])
+  }, [onMarkerClick, option.points, preview])
 
   const replaceUrl = () => {
     const hash = utoa(JSON.stringify(option));
@@ -107,52 +115,50 @@ function MapContainer({
   );
 }
 
+export type CreateMarkerPropsType = Pick<PropsType, 'preview' | 'onMarkerChange' | 'onMarkerClick' | 'onMarkerRemove'> & { display?: boolean, point: PointType }
+
 export function createMarker({
   point,
   preview = false,
-  onClickMarker,
+  onMarkerClick,
+  onMarkerChange,
+  onMarkerRemove,
   display = false,
-}: {
-  point: PointType;
-  preview?: boolean;
-  onClickMarker?: (e: any) => void;
-  display?: boolean;
-}) {
+}: CreateMarkerPropsType) {
   if (!AMap || !AMapInstance) {
     throw new Error("AMap is not loaded");
   }
   if (markers[point.location.toString()]) {
     setZoomAndCenter(point)
+    return
   }
 
   const marker = new AMap.Marker({
     position: point.location,
     map: AMapInstance,
-    content: point.icon
+    content: point.icon || '🚩'
   });
   console.log('**Create Marker**', point)
   markers[point.location.toString()] = marker;
+  display && setZoomAndCenter(point)
   marker.setLabel({
     direction: 'top-center',
     offset: [0, 0],
     content: point.title, //设置文本标注内容
   });
   const element = document.createElement("div");
-  const elementChildren = (
-    <div className="flex flex-col gap-2">
-      <h6 className="text-xs">{point.title}</h6>
-      {!preview ? (
-        <Textarea
-          defaultValue={point.description}
-          onChange={(e) => {
-            point.description = e.target.value;
-          }}
-        />
-      ) : (
-        <div className="text-xs">{point.description}</div>
-      )}
-    </div>
-  );
+  const elementChildren = <Display 
+    point={point} 
+    isDetail={false} 
+    onChange={onMarkerChange} 
+    onRemove={(point) => {
+      infoWindow?.close();
+      onMarkerRemove(point)
+    }} 
+    onClickAway={() => {
+      infoWindow?.close();
+    }}
+  />
   const root = createRoot(element);
   root.render(elementChildren);
   // @ts-ignore
@@ -160,14 +166,13 @@ export function createMarker({
   // @ts-ignore
   marker.point = point;
   marker.on("click", (e) => {
-    if (preview) {
-      infoWindow?.setContent(e.target.element);
-      const position = e.target.getPosition();
-      setTimeout(() => {
-        infoWindow?.open(AMapInstance!, position);
-      });
-    }
-    onClickMarker && onClickMarker({ e, point });
+    setZoomAndCenter(point)
+    infoWindow?.setContent(e.target.element);
+    const position = e.target.getPosition();
+    setTimeout(() => {
+      infoWindow?.open(AMapInstance!, position);
+    });
+    onMarkerClick && onMarkerClick({ e, point });
   });
   display && marker.emit("click", { target: marker });
   return marker;
@@ -204,11 +209,11 @@ export function updateMarker(point: PointType) {
   createMarker({
     point,
     // @ts-ignore
-    onClickMarker: preMarker.point?.onClickMarker
+    onMarkerClick: preMarker.point?.onMarkerClick
   })
 }
 
-export function setZoomAndCenter(point: PointType, zoom: number = 8) {
+export function setZoomAndCenter(point: PointType, zoom: number = 10) {
   if (!AMapInstance) {
     throw new Error("AMap is not loaded");
   }

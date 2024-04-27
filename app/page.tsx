@@ -8,7 +8,7 @@ import Display from "./display";
 import { PointType } from "./types";
 import { removeMarker } from "./amap";
 import { atou, utoa } from "./utils";
-import { createPointToNotion, listPointFromNotion, updatePointToNotion } from "./api";
+import { createPointToNotion, listPointFromNotion, removePointFromNotion, updatePointToNotion } from "./api";
 import { useImmer } from "use-immer";
 import { cloneDeep } from "lodash-es";
 
@@ -36,8 +36,8 @@ export default function Home() {
     mapStyle: process.env.BMAP_STYLE_ID,
     points: [],
   })
-  const [currentPoint, setCurrentPoint] = useState<PointType | null>(null);
-  const [isDetail, setIsDetail] = useState<boolean>(false);
+  // const [currentPoint, setCurrentPoint] = useState<PointType | null>(null);
+  // const [isDetail, setIsDetail] = useState<boolean>(false);
 
   useEffect(() => {
     listPointFromNotion().then((res) => {
@@ -71,43 +71,39 @@ export default function Home() {
   //   return () => document.removeEventListener("keydown", down);
   // });
 
-  const onClickMarker = ({ point }: { point: PointType }) => {
-    setCurrentPoint(point);
+  const onMarkerClick = ({ point }: { point: PointType }) => {
+    // setCurrentPoint(point);
   };
 
-  const onClickSearchItem = (point: PointType) => {
-    const marker = getMarker(point);
-    if (marker) {
-      setZoomAndCenter(point)
-      // @ts-ignore
-      setCurrentPoint(marker.point)
-      return
-    }
-    setCurrentPoint(point);
-    createMarker({
-      preview: false,
-      point,
-      onClickMarker,
-    });
-  };
-
-  const onRemoveMarker = (point: PointType) => {
-    setCurrentPoint(null);
-    removeMarker(point);
-  }
-
-  const onOk = (point: PointType) => {
+  const onMarkerChange = (point: PointType) => {
     updateMarker(point);
     return new Promise((resolve) => {
       return point.id ? updatePointToNotion(point) : createPointToNotion(point);
     }).then(res => {
       console.log('res',res)
     })
-  }
+  };
 
-  const onCancel = () => {
-    setCurrentPoint(null);
-  }
+  const onMarkerRemove = (point: PointType) => {
+    removeMarker(point);
+    removePointFromNotion(point)
+  };
+
+  const onClickSearchItem = (point: PointType) => {
+    const marker = getMarker(point);
+    if (marker) {
+      setZoomAndCenter(point)
+      return
+    }
+    createMarker({
+      preview: false,
+      point,
+      onMarkerClick,
+      onMarkerChange,
+      onMarkerRemove,
+      display: true
+    });
+  };
 
   return (
     <>
@@ -115,9 +111,10 @@ export default function Home() {
       <MapContainer
         className="w-screen h-screen"
         option={mapOption}
-        onClickMarker={onClickMarker}
+        onMarkerClick={onMarkerClick}
+        onMarkerChange={onMarkerChange}
+        onMarkerRemove={onMarkerRemove}
       />
-      {currentPoint ? <Display point={currentPoint} isDetail={isDetail} onRemove={onRemoveMarker} onOk={onOk} onCancel={onCancel} /> : null}
     </>
   );
 }

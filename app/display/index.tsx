@@ -4,21 +4,40 @@ import EmojiPicker, { EmojiStyle } from "emoji-picker-react";
 import { Input } from "@/components/ui/input";
 import { PointType } from "../types";
 import { useImmer } from "use-immer";
-import { Button } from "@/components/ui/button";
+import { useRef } from "react";
+import { useClickAway } from "react-use";
 
 type PropsType = {
   isDetail: boolean
   point: PointType
   onRemove: (point: PointType) => void
-  onOk: (point: PointType) => void
-  onCancel: (point?: PointType) => void
+  onChange: (point: PointType) => void
+  onClickAway: () => void
 }
 
-export default function Display({ isDetail, point, onRemove, onOk, onCancel }: PropsType) {
-  const [form, setForm] = useImmer(point)
+export default function Display({ isDetail, point, onRemove, onChange, onClickAway } : PropsType) {
+  const isChange = useRef(false)
+  const [form, _setForm] = useImmer(point)
+
+  if (isChange.current) {
+    onChange(form) 
+    isChange.current = false
+  }
+
+  const setForm = (fn: (draft: PointType) => void) => {
+    _setForm((draft) => {
+      fn(draft)
+    })
+    isChange.current = true
+  }
+
+  const ref = useRef(null);
+  useClickAway(ref, () => {
+    onClickAway()
+  });
 
   return (
-    <div className="bg-background w-96 p-3 absolute right-5 top-5 z-50 border rounded-md shadow">
+    <div ref={ref} className="bg-background w-96 p-3 border rounded-md shadow">
       <Popover>
         <PopoverTrigger>
           <div className="text-2xl p-1 hover:bg-[#E0F0FF] rounded-md mb-2">{ form.icon  || '🚩'  }</div>
@@ -47,15 +66,15 @@ export default function Display({ isDetail, point, onRemove, onOk, onCancel }: P
       </div>
       <div className="flex flex-col gap-2 mt-3">
         <div>简介</div>
-        <Textarea className="px-2" value={form.description} onChange={(e) => {
-          setForm((draft) => {
-            draft.description = e.target.value
-          })
-        }} />
-      </div>
-      <div className="flex mt-5 justify-end gap-2">
-        <Button onClick={() => onOk(form)}>确认</Button>
-        <Button onClick={() => onCancel(form)} variant={'outline'}>取消</Button>
+        <Textarea 
+          className="px-2 resize-none" 
+          value={form.description}
+          onChange={(e) => {
+            setForm((draft) => {
+              draft.description = e.target.value
+            })
+          }} 
+        />
       </div>
     </div>
   )

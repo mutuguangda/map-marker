@@ -43,7 +43,7 @@ export async function createPointToNotion(point: PointType) {
   const response = await notion.pages.create({
     icon: {
       type: "emoji",
-      emoji: point.icon as any || "📌",
+      emoji: point.icon as any,
     },
     parent: {
       type: "database_id",
@@ -143,6 +143,21 @@ export async function updatePointToNotion(point: PointType) {
         ],
       }
     },
+  });
+  return response
+}
+
+export async function removePointFromNotion(point: PointType) {
+  const databaseId = process.env.NOTION_DATABASE_ID;
+  if (!databaseId) {
+    throw new Error("NOTION_DATABASE_ID is not set");
+  }
+  if (!point.id) {
+    throw new Error("Point id is not set");
+  }
+  const response = await notion.pages.update({
+    page_id: point.id,
+    in_trash: true
   });
   return response
 }
