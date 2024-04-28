@@ -98,6 +98,7 @@ export default function Home() {
   };
 
   const onClickSearchItem = (point: PointType) => {
+    console.log('point',point)
     const marker = getMarker(point);
     if (marker) {
       setZoomAndCenter(point)

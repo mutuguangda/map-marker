@@ -203,7 +203,7 @@ export function Search({ onClickSearchItem }: PropsType) {
       positions[(e.target as unknown as any).getAttribute("data-index")];
     const point: PointType = {
       title: position["name"],
-      address: position["address"],
+      address: `${position['pname']}${position['cityname']}${position['adname']}${position["address"]}`,
       location: position.location.split(",").map(parseFloat) as any,
       description: "",
     };
