@@ -77,19 +77,19 @@ export default function Home() {
 
   const onMarkerChange = (point: PointType) => {
     return new Promise(() => {
-      return point.id ? updatePointToNotion(point, localStorage.getItem('password') || '') : createPointToNotion(point, localStorage.getItem('password') || '');
+      return point.id ? updatePointToNotion(point, localStorage?.getItem('password') || '') : createPointToNotion(point, localStorage?.getItem('password') || '');
     }).then(() => {
       updateMarker(point);
     })
   };
 
   const onMarkerRemove = async (point: PointType) => {
-    await removePointFromNotion(point, localStorage.getItem('password') || '')
+    await removePointFromNotion(point, localStorage?.getItem('password') || '')
     removeMarker(point);
   };
 
   const onMarkerOk = async (point: PointType) => {
-    point.id ? await updatePointToNotion(point, localStorage.getItem('password') || '') : await createPointToNotion(point, localStorage.getItem('password') || '');
+    point.id ? await updatePointToNotion(point, localStorage?.getItem('password') || '') : await createPointToNotion(point, localStorage?.getItem('password') || '');
     updateMarker(point);
   };
 

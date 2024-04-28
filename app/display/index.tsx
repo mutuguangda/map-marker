@@ -35,7 +35,7 @@ export default function Display({
   onOk,
   onCancel,
 }: PropsType) {
-  point = point.icon ? point : { ...point, icon: localStorage.getItem('defaultIcon') || "🚩" };
+  point = point.icon ? point : { ...point, icon: localStorage?.getItem('defaultIcon') || "🚩" };
   const [form, _setForm] = useImmer(point);
   const [loading, setLoading] = useState(false);
   const [disabled, setDisabled] = useState(true);
