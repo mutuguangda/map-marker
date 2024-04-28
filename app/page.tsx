@@ -2,13 +2,27 @@
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useCopyToClipboard } from "react-use";
 import { useToast } from "@/components/ui/use-toast";
-import MapContainer, { BMapOptionType, closeInfoWindow, createMarker, getMarker, isPointExsit, markers, setZoomAndCenter, updateMarker } from "./amap";
+import MapContainer, {
+  BMapOptionType,
+  closeInfoWindow,
+  createMarker,
+  getMarker,
+  isPointExsit,
+  markers,
+  setZoomAndCenter,
+  updateMarker,
+} from "./amap";
 import { Panel } from "./panel";
 import Display from "./display";
 import { PointType } from "./types";
 import { removeMarker } from "./amap";
 import { atou, utoa } from "./utils";
-import { createPointToNotion, listPointFromNotion, removePointFromNotion, updatePointToNotion } from "./api";
+import {
+  createPointToNotion,
+  listPointFromNotion,
+  removePointFromNotion,
+  updatePointToNotion,
+} from "./api";
 import { useImmer } from "use-immer";
 import { cloneDeep } from "lodash-es";
 
@@ -35,7 +49,7 @@ export default function Home() {
   const [mapOption, setMapOption] = useImmer<BMapOptionType>({
     mapStyle: process.env.BMAP_STYLE_ID,
     points: [],
-  })
+  });
   // const [currentPoint, setCurrentPoint] = useState<PointType | null>(null);
   // const [isDetail, setIsDetail] = useState<boolean>(false);
 
@@ -43,10 +57,10 @@ export default function Home() {
     listPointFromNotion().then((res) => {
       setMapOption((draft) => {
         draft.points = res;
-      })
+      });
     });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // useEffect(() => {
   //   const down = (e: KeyboardEvent) => {
@@ -77,32 +91,61 @@ export default function Home() {
 
   const onMarkerChange = (point: PointType) => {
     return new Promise(() => {
-      return point.id ? updatePointToNotion(point, localStorage?.getItem('password') || '') : createPointToNotion(point, localStorage?.getItem('password') || '');
+      return point.id
+        ? updatePointToNotion(
+            point,
+            typeof window !== "undefined"
+              ? localStorage.getItem("password") || ""
+              : ""
+          )
+        : createPointToNotion(
+            point,
+            typeof window !== "undefined"
+              ? localStorage.getItem("password") || ""
+              : ""
+          );
     }).then(() => {
       updateMarker(point);
-    })
+    });
   };
 
   const onMarkerRemove = async (point: PointType) => {
-    await removePointFromNotion(point, localStorage?.getItem('password') || '')
+    await removePointFromNotion(
+      point,
+      typeof window !== "undefined"
+        ? localStorage.getItem("password") || ""
+        : ""
+    );
     removeMarker(point);
   };
 
   const onMarkerOk = async (point: PointType) => {
-    point.id ? await updatePointToNotion(point, localStorage?.getItem('password') || '') : await createPointToNotion(point, localStorage?.getItem('password') || '');
+    point.id
+      ? await updatePointToNotion(
+          point,
+          typeof window !== "undefined"
+            ? localStorage.getItem("password") || ""
+            : ""
+        )
+      : await createPointToNotion(
+          point,
+          typeof window !== "undefined"
+            ? localStorage.getItem("password") || ""
+            : ""
+        );
     updateMarker(point);
   };
 
   const onMarkerCancel = () => {
-    closeInfoWindow()
+    closeInfoWindow();
   };
 
   const onClickSearchItem = (point: PointType) => {
-    console.log('point',point)
+    console.log("point", point);
     const marker = getMarker(point);
     if (marker) {
-      setZoomAndCenter(point)
-      return
+      setZoomAndCenter(point);
+      return;
     }
     createMarker({
       preview: false,
@@ -112,13 +155,16 @@ export default function Home() {
       onMarkerRemove,
       onMarkerOk,
       onMarkerCancel,
-      display: true
+      display: true,
     });
   };
 
   return (
     <>
-      <Panel onClickSearchItem={onClickSearchItem} pointList={mapOption.points} />
+      <Panel
+        onClickSearchItem={onClickSearchItem}
+        pointList={mapOption.points}
+      />
       <MapContainer
         className="w-screen h-screen"
         option={mapOption}

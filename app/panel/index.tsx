@@ -26,7 +26,7 @@ export function Panel({ onClickSearchItem, pointList }: PropsType) {
     setActiveKey(key);
   };
 
-  const [defaultIcon, setDefaultIcon] = useState(localStorage?.getItem('defaultPoint') || '🚩');
+  const [defaultIcon, setDefaultIcon] = useState(localStorage.getItem('defaultPoint') || '🚩');
 
   return (
     <div className="h-[50vh] fixed z-10 left-5 top-5 flex border rounded-md bg-background">
@@ -67,9 +67,9 @@ export function Panel({ onClickSearchItem, pointList }: PropsType) {
                 className="mt-2"
                 type="password"
                 onChange={(e) => {
-                  localStorage?.setItem("password", e.target.value);
+                  typeof window !== 'undefined' && localStorage.setItem("password", e.target.value);
                 }}
-                defaultValue={localStorage?.getItem("password") || ''}
+                defaultValue={typeof window !== 'undefined' ? localStorage.getItem("password") || '': ''}
               />
             </div>
             <div>
@@ -86,7 +86,7 @@ export function Panel({ onClickSearchItem, pointList }: PropsType) {
                       emojiStyle={EmojiStyle.NATIVE}
                       onEmojiClick={(emojiData) => {
                         setDefaultIcon(emojiData.emoji)
-                        localStorage?.setItem("defaultPoint", emojiData.emoji);
+                        typeof window !== 'undefined' && localStorage.setItem("defaultPoint", emojiData.emoji);
                       }}
                     />
                   </PopoverContent>

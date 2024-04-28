@@ -35,7 +35,15 @@ export default function Display({
   onOk,
   onCancel,
 }: PropsType) {
-  point = point.icon ? point : { ...point, icon: localStorage?.getItem('defaultIcon') || "🚩" };
+  point = point.icon
+    ? point
+    : {
+        ...point,
+        icon:
+          typeof window !== "undefined"
+            ? localStorage.getItem("defaultIcon") || "🚩"
+            : "🚩",
+      };
   const [form, _setForm] = useImmer(point);
   const [loading, setLoading] = useState(false);
   const [disabled, setDisabled] = useState(true);
@@ -65,10 +73,8 @@ export default function Display({
     <div className="flex justify-between items-center">
       <div className="flex flex-col gap-2">
         <div className="flex gap-1 items-baseline">
-        <div className="text-xl">
-          {form.icon}
-        </div>
-        <span>{form.title}</span>
+          <div className="text-xl">{form.icon}</div>
+          <span>{form.title}</span>
         </div>
         <span className="text-xs text-gray-400">{form.description}</span>
       </div>
