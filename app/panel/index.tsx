@@ -26,7 +26,7 @@ export function Panel({ onClickSearchItem, pointList }: PropsType) {
     setActiveKey(key);
   };
 
-  const [defaultIcon, setDefaultIcon] = useState(localStorage.getItem('defaultPoint') || '🚩');
+  const [defaultIcon, setDefaultIcon] = useState(typeof window !== 'undefined' ? localStorage.getItem('defaultPoint') || '🚩': '🚩');
 
   return (
     <div className="h-[50vh] fixed z-10 left-5 top-5 flex border rounded-md bg-background">
