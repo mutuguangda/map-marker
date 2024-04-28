@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Popover,
   PopoverContent,
@@ -15,16 +17,18 @@ import Notion from "./point-detail";
 import PointDetail from "./point-detail";
 
 type PropsType = {
+  preview?: boolean;
   point: PointType;
-  onRemove: (point: PointType) => void;
+  onRemove?: (point: PointType) => void;
   onChange?: (point: PointType) => void;
   onClickAway?: () => void;
-  onOk: (point: PointType) => Promise<any>;
-  onCancel: (point: PointType) => void;
+  onOk?: (point: PointType) => Promise<any>;
+  onCancel?: (point: PointType) => void;
 };
 
 export default function Display({
   point,
+  preview = false,
   onRemove,
   onChange,
   onClickAway,
@@ -51,14 +55,33 @@ export default function Display({
 
   const handleOk = async () => {
     setLoading(true);
-    await onOk(form);
+    onOk && (await onOk(form));
     setLoading(false);
     setDisabled(true);
   };
 
-  return (
+  const Preview = (
+    <div className="flex justify-between items-center">
+      <div className="flex flex-col gap-2">
+        <div className="flex gap-1 items-baseline">
+        <div className="text-xl">
+          {form.icon || "🚩"}
+        </div>
+        <span>{form.title}</span>
+        </div>
+        <span className="text-xs text-gray-400">{form.description}</span>
+      </div>
+      <div
+        className="text-2xl leading-6 p-1 hover:bg-[#E0F0FF] rounded-md cursor-pointer"
+        onClick={() => setOpen(true)}
+      >
+        <span className="icon-[heroicons--chevron-right-16-solid]"></span>
+      </div>
+    </div>
+  );
+
+  const Form = (
     <>
-    <div ref={ref} className="bg-background w-96 p-3 border rounded-md shadow">
       <div className="mb-2 flex justify-between items-center">
         <Popover>
           <PopoverTrigger>
@@ -77,7 +100,10 @@ export default function Display({
             />
           </PopoverContent>
         </Popover>
-        <div className="text-2xl leading-6 p-1 hover:bg-[#E0F0FF] rounded-md cursor-pointer" onClick={() => setOpen(true)}>
+        <div
+          className="text-2xl leading-6 p-1 hover:bg-[#E0F0FF] rounded-md cursor-pointer"
+          onClick={() => setOpen(true)}
+        >
           <span className="icon-[heroicons--chevron-right-16-solid]"></span>
         </div>
       </div>
@@ -93,7 +119,7 @@ export default function Display({
         />
         <div
           className="flex-shrink-0 cursor-pointer h-9 flex justify-center items-center w-9 text-white rounded-md bg-red-500 hover:text-red-100 hover:bg-red-400"
-          onClick={() => onRemove(point)}
+          onClick={() => onRemove && onRemove(point)}
         >
           <span className="icon-[heroicons--trash]"></span>
         </div>
@@ -123,12 +149,27 @@ export default function Display({
         >
           确认
         </Button>
-        <Button onClick={() => onCancel(form)}>取消</Button>
+        <Button onClick={() => onCancel && onCancel(form)}>取消</Button>
       </div>
-    </div>
-    <Drawer title={point.title} open={open} size="large" onClose={() => setOpen(false)}>
-      <PointDetail point={point} />
-    </Drawer>
+    </>
+  );
+
+  return (
+    <>
+      <div
+        ref={ref}
+        className="bg-background w-96 p-3 border rounded-md shadow"
+      >
+        {preview ? Preview : Form}
+      </div>
+      <Drawer
+        title={point.title}
+        open={open}
+        size="large"
+        onClose={() => setOpen(false)}
+      >
+        <PointDetail point={point} />
+      </Drawer>
     </>
   );
 }

@@ -24,7 +24,7 @@ export function Panel({
   };
 
   return (
-    <div className="h-[588px] fixed z-10 left-5 top-5 flex border rounded-md bg-background">
+    <div className="h-[50vh] fixed z-10 left-5 top-5 flex border rounded-md bg-background">
       <Aside activeKey={activeKey} onNavItemClick={handleNavItemClick} />
       <div className="w-80 p-3 h-full">
         <div className={activeKey === "search" ? "block" : "hidden"}>

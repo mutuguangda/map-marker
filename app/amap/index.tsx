@@ -11,13 +11,13 @@ import Display from "../display";
 
 interface PropsType {
   className?: string;
-  option?: BMapOptionType;
+  option: BMapOptionType;
   preview?: boolean;
-  onMarkerClick: ({ e, point }: { e: any; point: PointType }) => void;
+  onMarkerClick?: ({ e, point }: { e: any; point: PointType }) => void;
   onMarkerChange?: (point: PointType) => void;
-  onMarkerRemove: (point: PointType) => void;
-  onMarkerOk: (point: PointType) => Promise<any>;
-  onMarkerCancel: (point: PointType) => void;
+  onMarkerRemove?: (point: PointType) => void;
+  onMarkerOk?: (point: PointType) => Promise<any>;
+  onMarkerCancel?: (point: PointType) => void;
 }
 
 export interface BMapOptionType {
@@ -96,7 +96,6 @@ function MapContainer({
         point,
         preview,
         onMarkerClick,
-        // onMarkerChange,
         onMarkerRemove,
         onMarkerOk,
         onMarkerCancel,
@@ -104,10 +103,9 @@ function MapContainer({
       });
     });
     return () => {
-      console.log('create marker destroy')
       AMapInstance && removeAllMarker()
     };
-  }, [onMarkerClick, option.points, preview])
+  }, [onMarkerCancel, onMarkerClick, onMarkerOk, onMarkerRemove, option.points, preview])
 
   const replaceUrl = () => {
     const hash = utoa(JSON.stringify(option));
@@ -158,10 +156,10 @@ export function createMarker({
   const elementChildren = (
     <Display 
       point={point} 
-      isDetail={false} 
+      preview={preview} 
       onRemove={(point) => {
         infoWindow?.close();
-        onMarkerRemove(point)
+        onMarkerRemove && onMarkerRemove(point)
       }} 
       // onClickAway={() => {
       //   infoWindow?.close();
