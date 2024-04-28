@@ -35,7 +35,10 @@ export async function listPointFromNotion() {
   return result;
 }
 
-export async function createPointToNotion(point: PointType) {
+export async function createPointToNotion(point: PointType, password: string) {
+  if (process.env.PASSWORD !== password) {
+    throw new Error("Invalid password")
+  }
   const databaseId = process.env.NOTION_DATABASE_ID;
   if (!databaseId) {
     throw new Error("NOTION_DATABASE_ID is not set");
@@ -91,7 +94,10 @@ export async function createPointToNotion(point: PointType) {
   return response
 }
 
-export async function updatePointToNotion(point: PointType) {
+export async function updatePointToNotion(point: PointType, password: string) {
+  if (process.env.PASSWORD !== password) {
+    throw new Error("Invalid password")
+  }
   const databaseId = process.env.NOTION_DATABASE_ID;
   if (!databaseId) {
     throw new Error("NOTION_DATABASE_ID is not set");
@@ -103,7 +109,7 @@ export async function updatePointToNotion(point: PointType) {
     page_id: point.id,
     icon: {
       type: "emoji",
-      emoji: point.icon as any || "📌",
+      emoji: point.icon as any,
     },
     properties: {
       Name: {
@@ -147,7 +153,10 @@ export async function updatePointToNotion(point: PointType) {
   return response
 }
 
-export async function removePointFromNotion(point: PointType) {
+export async function removePointFromNotion(point: PointType, password: string) {
+  if (process.env.PASSWORD !== password) {
+    throw new Error("Invalid password")
+  }
   const databaseId = process.env.NOTION_DATABASE_ID;
   if (!databaseId) {
     throw new Error("NOTION_DATABASE_ID is not set");

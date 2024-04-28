@@ -35,6 +35,7 @@ export default function Display({
   onOk,
   onCancel,
 }: PropsType) {
+  point = point.icon ? point : { ...point, icon: localStorage.getItem('defaultIcon') || "🚩" };
   const [form, _setForm] = useImmer(point);
   const [loading, setLoading] = useState(false);
   const [disabled, setDisabled] = useState(true);
@@ -65,7 +66,7 @@ export default function Display({
       <div className="flex flex-col gap-2">
         <div className="flex gap-1 items-baseline">
         <div className="text-xl">
-          {form.icon || "🚩"}
+          {form.icon}
         </div>
         <span>{form.title}</span>
         </div>
