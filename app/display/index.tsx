@@ -6,14 +6,14 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
-import EmojiPicker, { EmojiStyle } from "emoji-picker-react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import EmojiPicker, { EmojiStyle } from "emoji-picker-react";
 import { PointType } from "../types";
 import { useImmer } from "use-immer";
 import { useRef, useState } from "react";
 import { useClickAway } from "react-use";
-import { Button, Drawer } from "antd";
-import Notion from "./point-detail";
+import { Drawer } from "antd";
 import PointDetail from "./point-detail";
 
 type PropsType = {
@@ -89,7 +89,7 @@ export default function Display({
 
   const Form = (
     <>
-      <div className="mb-2 flex justify-between items-center">
+      <div className="mb-2">
         <Popover>
           <PopoverTrigger>
             <div className="text-2xl p-1 hover:bg-[#E0F0FF] rounded-md">
@@ -107,12 +107,6 @@ export default function Display({
             />
           </PopoverContent>
         </Popover>
-        <div
-          className="text-2xl leading-6 p-1 hover:bg-[#E0F0FF] rounded-md cursor-pointer"
-          onClick={() => setOpen(true)}
-        >
-          <span className="icon-[heroicons--chevron-right-16-solid]"></span>
-        </div>
       </div>
       <div className="flex gap-2 items-center">
         <Input
@@ -133,7 +127,7 @@ export default function Display({
       </div>
       <div className="flex flex-col gap-2 mt-3">
         <div>地址</div>
-        <div>{form.address || "--"}</div>
+        <div>{ form.address || "--" }</div>
       </div>
       <div className="flex flex-col gap-2 mt-3">
         <div>简介</div>
@@ -150,13 +144,16 @@ export default function Display({
       <div className="flex mt-5 justify-end gap-2">
         <Button
           onClick={handleOk}
-          type="primary"
-          loading={loading}
           disabled={disabled}
         >
           确认
         </Button>
-        <Button onClick={() => onCancel && onCancel(form)}>取消</Button>
+        <Button 
+          variant='outline' 
+          onClick={() => onCancel && onCancel(form)}
+        >
+          取消
+        </Button>
       </div>
     </>
   );

@@ -238,8 +238,8 @@ export function Search({ onClickSearchItem }: PropsType) {
       <div className="bg-background rounded-md">
         <InputSearch placeholder="搜索地点" onKeyUp={handleKeyUp} />
       </div>
-      <ScrollArea className="mt-2">
-        <div className="mt-2 flex flex-col gap-2" onClick={handleClick}>
+      <ScrollArea>
+        <div className="flex flex-col gap-2" onClick={handleClick}>
           {positions.map((position, index) => {
             return (
               <div

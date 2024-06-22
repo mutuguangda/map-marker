@@ -32,8 +32,8 @@ export function Panel({ onClickSearchItem, pointList }: PropsType) {
     <div className="h-[50vh] fixed z-10 left-5 top-5 flex border rounded-md bg-background">
       <Aside activeKey={activeKey} onNavItemClick={handleNavItemClick} />
       <div className="w-80 p-3 h-full">
-        <div className={activeKey === "search" ? "block" : "hidden"}>
-          <div className="bg-background rounded-md">
+        <div className={activeKey === "search" ? "block h-full" : "hidden"}>
+          <div className="bg-background rounded-md h-full flex flex-col gap-2">
             <Search onClickSearchItem={onClickSearchItem} />
           </div>
         </div>
