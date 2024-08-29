@@ -5,7 +5,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "sync-notion-marker": "tsx --tsconfig ./tsconfig.node.json ./scripts/sync-notion-marker.ts"
   },
   "dependencies": {
     "@amap/amap-jsapi-loader": "^1.0.1",
@@ -47,11 +48,13 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "autoprefixer": "^10.0.1",
+    "dotenv": "^16.4.5",
     "eslint": "^8",
     "eslint-config-next": "14.1.4",
     "fflate": "^0.8.2",
     "postcss": "^8",
     "tailwindcss": "^3.3.0",
+    "tsx": "^4.17.0",
     "typescript": "^5"
   }
 }
