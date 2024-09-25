@@ -2,6 +2,8 @@
 
 基于 Next.js + Notion + 高德 API 的地图标点工具
 
+目前仍处于开发阶段，欢迎 PR。
+
 ## 开始
 
 如果你选择 clone 或者 fork 本仓库，需要在 `.env.local` 文件中配置以下环境变量：
