@@ -2,8 +2,10 @@
 
 import { Client } from "@notionhq/client";
 import { PointType } from "../types";
+import { NotionAPI } from "notion-client";
 
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
+const reactNotionXClient = new NotionAPI();
 
 export async function listPointFromNotion() {
   const databaseId = process.env.NOTION_DATABASE_ID;
@@ -178,4 +180,10 @@ export async function getPointDetailFromNotion(point: PointType) {
   return notion.blocks.children.list({
     block_id: point.id,
   });
+}
+
+export async function getRecordMap(point: PointType) {
+  if (!point.id) return null
+  console.log('getRecordMap')
+  return reactNotionXClient.getPage(point.id)
 }

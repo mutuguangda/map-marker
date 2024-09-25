@@ -1,10 +1,8 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 "use client";
 import { KeyboardEventHandler, useEffect, useRef, useState, forwardRef, memo } from "react";
 import { createRoot } from "react-dom/client";
 import "@amap/amap-jsapi-types";
 import { utoa } from "../utils";
-import { Textarea } from "../../components/ui/textarea";
 import { PointType } from "../types";
 import { getEnvConfig } from "../utils/env";
 import Display from "../display";
@@ -30,8 +28,6 @@ export let AMapInstance: AMap.Map | null = null;
 export let infoWindow: AMap.InfoWindow | null = null;
 export let markers: { [k: string]: AMap.Marker | null } = {};
 
-// const { BMAP_STYLE_ID } = getEnvConfig()
-
 export default memo(MapContainer)
 
 function MapContainer({
@@ -55,8 +51,7 @@ function MapContainer({
     window._AMapSecurityConfig = {
       serviceHost: `${location.origin}/_AMapService`,
     };
-    getEnvConfig().then(({ BMAP_STYLE_ID }: any) => {
-      // const mapStyle = option.mapStyle || `amap://styles/${process.env.BMAP_STYLE_ID}`;      
+    getEnvConfig().then(({ BMAP_STYLE_ID }: any) => { 
       const mapStyle = option.mapStyle || `amap://styles/${BMAP_STYLE_ID}`;      
       import("@amap/amap-jsapi-loader").then((AMapLoader) => {
         AMapLoader.load({

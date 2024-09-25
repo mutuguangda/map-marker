@@ -1,5 +1,4 @@
 "use client";
-
 import {
   Popover,
   PopoverContent,
@@ -127,7 +126,7 @@ export default function Display({
       </div>
       <div className="flex flex-col gap-2 mt-3">
         <div>地址</div>
-        <div>{ form.address || "--" }</div>
+        <div>{form.address || "--"}</div>
       </div>
       <div className="flex flex-col gap-2 mt-3">
         <div>简介</div>
@@ -142,16 +141,10 @@ export default function Display({
         />
       </div>
       <div className="flex mt-5 justify-end gap-2">
-        <Button
-          onClick={handleOk}
-          disabled={disabled}
-        >
+        <Button onClick={handleOk} disabled={disabled}>
           确认
         </Button>
-        <Button 
-          variant='outline' 
-          onClick={() => onCancel && onCancel(form)}
-        >
+        <Button variant="outline" onClick={() => onCancel && onCancel(form)}>
           取消
         </Button>
       </div>

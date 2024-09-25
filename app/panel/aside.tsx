@@ -3,11 +3,6 @@ import { cn } from '@/lib/utils'
 import Link from 'next/link'
 
 export default function Aside({ activeKey, onNavItemClick }: { activeKey: 'search' | 'point' | 'setting', onNavItemClick: (key: 'search' | 'point' | 'setting') => void}) {
-
-  // 如何更优雅的进行事件委托？DOM 结构？
-  // const handleNacClick: MouseEventHandler<HTMLElement> = (e) => {
-  //   console.log('e',e)
-  // }
   return (
     <aside className="hidden w-12 flex-col bg-background sm:flex border-r">
       <nav className="flex flex-col items-center gap-4 px-2 sm:py-3">

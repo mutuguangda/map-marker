@@ -16,8 +16,7 @@ export default function Page() {
         draft.points = res;
       })
     });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [setMapOption])
 
   return (
     <MapContainer className="w-screen h-screen" option={mapOption} preview={true} />

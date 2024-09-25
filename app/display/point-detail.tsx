@@ -1,23 +1,23 @@
-"use client"
+"use client";
 
-import * as React from 'react'
-import { PointType } from '../types'
-import { getPointDetailFromNotion } from '../api'
+import { NotionPage } from "@/components/notion";
+import { useEffect, useState } from "react";
+import { getRecordMap } from "../api";
 
-type PropsType = {
-  point: PointType
-}
+export default function PointDetail({ point }: any) {
+  const [data, setData] = useState<any>(null);
 
-export default function PointDetail({ point }: PropsType) {
-  const [blocks, setBlocks] = React.useState<any[]>([])
+  useEffect(() => {
+    if (!point.id) return
+    getRecordMap(point).then((res) => {
+      console.log('res',res)
+      setData(res);
+    });
+  }, [point]);
 
-  React.useEffect(() => {
-    getPointDetailFromNotion(point).then(res => {
-      setBlocks(res.results)
-    })
-  }, [point])
-
-  return (
-    <div>WIP</div>
-  )
+  return !data ? (
+    <div>Loading...</div>
+  ) : (
+    <NotionPage recordMap={data} rootPageId={point.id!} />
+  );
 }
