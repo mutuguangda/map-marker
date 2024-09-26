@@ -26,6 +26,7 @@ export interface BMapOptionType {
 export let AMap: AMapType | null = null;
 export let AMapInstance: AMap.Map | null = null;
 export let infoWindow: AMap.InfoWindow | null = null;
+export let isShowInfoWindow: boolean = false;
 export let markers: { [k: string]: AMap.Marker | null } = {};
 
 export default memo(MapContainer)
@@ -63,12 +64,19 @@ function MapContainer({
             AMap = res;
   
             AMapInstance = new AMap.Map(el.current!, {
-              viewMode: "3D",
+              viewMode: "2D",
               zoom: 4,
               mapStyle,
               showLabel: false,
             });
   
+            AMapInstance.on("click", () => {
+              if (preview && isShowInfoWindow) {
+                infoWindow?.close();
+                isShowInfoWindow = false;
+              }
+            })
+
             infoWindow = new AMap.InfoWindow({
               offset: new AMap.Pixel(0, -4),
               isCustom: true
@@ -86,6 +94,7 @@ function MapContainer({
   }, [option.mapStyle]);
 
   useEffect(() => {
+    if (!AMapInstance) return
     option.points.forEach((point) => {
       createMarker({
         point,
@@ -145,7 +154,7 @@ export function createMarker({
   marker.setLabel({
     direction: 'top-center',
     offset: [0, -4],
-    content: point.title, //设置文本标注内容
+    content: point.title,
   });
   const element = document.createElement("div");
   const elementChildren = (
@@ -156,9 +165,6 @@ export function createMarker({
         infoWindow?.close();
         onMarkerRemove && onMarkerRemove(point)
       }} 
-      // onClickAway={() => {
-      //   infoWindow?.close();
-      // }}
       onOk={onMarkerOk}
       onCancel={onMarkerCancel}
     />
@@ -180,6 +186,7 @@ export function createMarker({
     const position = e.target.getPosition();
     setTimeout(() => {
       infoWindow?.open(AMapInstance!, position);
+      isShowInfoWindow = true;
     });
     onMarkerClick && onMarkerClick({ e, point });
   });

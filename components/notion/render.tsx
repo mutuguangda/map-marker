@@ -1,40 +1,32 @@
-"use client"
+"use client";
 import { NotionRenderer } from "react-notion-x";
 import Link from "next/link";
-import dynamic from 'next/dynamic'
+import dynamic from "next/dynamic";
 import { ExtendedRecordMap } from "notion-types";
 
-import 'react-notion-x/src/styles.css'
-import 'prismjs/themes/prism-tomorrow.css'
-import 'katex/dist/katex.min.css'
+import "react-notion-x/src/styles.css";
+import "./style.css";
+import "prismjs/themes/prism-tomorrow.css";
+import "katex/dist/katex.min.css";
 
 const Code = dynamic(() =>
-  import('react-notion-x/build/third-party/code').then((m) => m.Code)
-)
-const Collection = dynamic(() =>
-  import('react-notion-x/build/third-party/collection').then(
-    (m) => m.Collection
-  )
-)
+  import("react-notion-x/build/third-party/code").then((m) => m.Code)
+);
 const Equation = dynamic(() =>
-  import('react-notion-x/build/third-party/equation').then((m) => m.Equation)
-)
-
+  import("react-notion-x/build/third-party/equation").then((m) => m.Equation)
+);
 const Modal = dynamic(
-  () => import('react-notion-x/build/third-party/modal').then((m) => m.Modal),
+  () => import("react-notion-x/build/third-party/modal").then((m) => m.Modal),
   {
-    ssr: false
+    ssr: false,
   }
-)
+);
 
 interface NotionPageProps {
   recordMap: ExtendedRecordMap;
-  rootPageId: string;
 }
-export const NotionPage = ({
-  recordMap,
-  rootPageId
-}: NotionPageProps) => {
+
+export const NotionPage = ({ recordMap }: NotionPageProps) => {
   if (!recordMap) {
     return null;
   }
@@ -43,16 +35,14 @@ export const NotionPage = ({
     <div className="notion__container">
       <NotionRenderer
         recordMap={recordMap}
-        fullPage={true}
-        darkMode={true}
-        rootPageId={rootPageId}
+        fullPage={false}
+        darkMode={false}
         previewImages
         components={{
           nextLink: Link,
-           Code,
-           Collection,
-           Equation,
-           Modal
+          Code,
+          Equation,
+          Modal,
         }}
       />
     </div>

@@ -18,6 +18,6 @@ export default function PointDetail({ point }: any) {
   return !data ? (
     <div>Loading...</div>
   ) : (
-    <NotionPage recordMap={data} rootPageId={point.id!} />
+    <NotionPage recordMap={data} />
   );
 }
