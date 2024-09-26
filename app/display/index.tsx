@@ -7,6 +7,13 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import EmojiPicker, { EmojiStyle } from "emoji-picker-react";
 import { PointType } from "../types";
 import { useImmer } from "use-immer";
@@ -77,12 +84,20 @@ export default function Display({
         </div>
         <span className="text-xs text-gray-400">{form.description}</span>
       </div>
-      <div
-        className="text-2xl leading-6 p-1 hover:bg-[#E0F0FF] rounded-md cursor-pointer"
-        onClick={() => setOpen(true)}
-      >
-        <span className="icon-[heroicons--chevron-right-16-solid]"></span>
-      </div>
+      <Sheet>
+        <SheetTrigger>
+          <span className="icon-[heroicons--chevron-right-16-solid]"></span>
+        </SheetTrigger>
+        <SheetContent
+          onPointerDownOutside={(e) => e.preventDefault()}
+          className="w-[calc(100%-40px)] sm:max-w-[calc(540px-40px)] h-[calc(100%-40px)] top-5 right-5 rounded-lg"
+        >
+          <SheetHeader>
+            <SheetTitle>{form.title}</SheetTitle>
+          </SheetHeader>
+          <PointDetail point={point} />
+        </SheetContent>
+      </Sheet>
     </div>
   );
 
@@ -159,14 +174,6 @@ export default function Display({
       >
         {preview ? Preview : Form}
       </div>
-      <Drawer
-        title={point.title}
-        open={open}
-        size="large"
-        onClose={() => setOpen(false)}
-      >
-        <PointDetail point={point} />
-      </Drawer>
     </>
   );
 }
