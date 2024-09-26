@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  pointer-events: auto !important;
+}
+
 @layer base {
   :root {
     --background: #f9f7f1;
