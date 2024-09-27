@@ -59,16 +59,4 @@ const notion = new Client({
     }
   });
   writeFileSync("data.json", JSON.stringify(data, null, 2));
-  // notion.blocks.update({
-  //   "block_id": syncCalloutBlockId,
-  //   "callout": {
-  //     "rich_text": [
-  //       {
-  //         "text": {
-  //           "content": `Last sync time: ${dayjs().format('YYYY-MM-DD HH:mm')}`
-  //         },
-  //       }
-  //     ]
-  //   }
-  // })
 })();

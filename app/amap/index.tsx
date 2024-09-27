@@ -91,7 +91,7 @@ function MapContainer({
     return () => {
       AMapInstance?.destroy();
     };
-  }, [option.mapStyle]);
+  }, [option.mapStyle, preview]);
 
   useEffect(() => {
     if (!AMapInstance) return
@@ -110,11 +110,6 @@ function MapContainer({
       AMapInstance && removeAllMarker()
     };
   }, [onMarkerCancel, onMarkerClick, onMarkerOk, onMarkerRemove, option.points, preview])
-
-  const replaceUrl = () => {
-    const hash = utoa(JSON.stringify(option));
-    window.history.replaceState({}, "", `${location.origin}#${hash}`);
-  };
 
   return (
     <div className="w-full h-full relative">
